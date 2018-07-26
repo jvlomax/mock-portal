@@ -1,0 +1,41 @@
+<div class="row">
+
+    {% if is_paginated %}
+        <div class="col-md-5">
+
+            {% if page_obj.has_previous %}
+                <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.paginate_by %}&paginate_by={{ request.GET.paginate_by }}{% endif %}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.game_completed %}&game_completed={{ request.GET.game_completed }}{% endif %}">&laquo;</a>
+            {% else %}
+                <span class="light-grey">&laquo;</span>
+            {% endif %}
+
+            <span class="page-current">
+                {{ page_obj.start_index }} - {{ page_obj.end_index }} of {{page_obj.paginator.count}}
+            </span>
+
+            {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}{% if request.GET.paginate_by %}&paginate_by={{ request.GET.paginate_by }}{% endif %}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}{% if request.GET.game_completed %}&game_completed={{ request.GET.game_completed }}{% endif %}">&raquo;</a>
+            {% else %}
+                <span class="light-grey">&raquo;</span>
+            {% endif %}
+
+        </div>
+    {% endif %}
+
+    <div class="{% if is_paginated %}col-md-1{% else %}col-md-1{% endif %}">
+        <div class="dropdown">
+            <button class="btn btn-xs dropdown-toggle" type="button" id="paginationDropdownMenu" data-toggle="dropdown" aria-expanded="true">
+                {% if request.GET.paginate_by %}{{ request.GET.paginate_by }}{% else %}View{% endif %}
+                <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu" role="menu" aria-labelledby="paginationDropdownMenu">
+                {% for option in pagination_options %}
+                    <li role="presentation">
+                        <a role="menuitem" tabindex="-1" href="{% url 'programme:players-list-view' programme.id %}?paginate_by={{ option }}{% if request.GET.game_completed %}&game_completed={{ request.GET.game_completed }}{% endif %}">{{ option }}</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    <div class="{% if is_paginated %}col-md-6{% else %}col-md-11{% endif %}"></div>
+</div>

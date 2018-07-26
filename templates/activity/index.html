@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% load i18n %}
+
+{% block title %}{% trans "ActivityDashboard" %}{% endblock title %}
+
+{% block nav %}{% with section="activity" %}{{ block.super }}{% endwith %}{% endblock nav %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-xs-12">
+            <p>
+                View the
+                <a href="https://p.datadoghq.com/sb/6c9d5be75-e2efe1b6ffa74927df5d54fecd005bfa">activity graphs</a>
+                which show, for example, the total number of players over the last year.
+            </p>
+        </div>
+    </div>
+
+    <h2>Activity Log</h2>
+    <p>
+        Log of player activity across all programmes in the last {{ time_period_hours }} hours. Highlighted rows represent play that <em>might</em> be in progress.
+    </p>
+
+<div class="row">
+    <table class="table">
+        <thead>
+            <tr>
+                <th></th>
+                <th colspan="2">When</th>
+                <th>Event</th>
+                <th>Programme</th>
+            </tr>
+        </thead>
+        {% for player in player_activity %}
+            <tr title="History" data-toggle="popover" data-trigger="hover" data-placement="auto" data-html="true" data-container="body" data-content="{% for timestamp, message in player.history %}<strong>{{ timestamp }}</strong><br>{{ message }}<br><br>{% endfor %}" class="{{ player.game_in_progress|yesno:'danger,' }}">
+                <td title="Click to view player detail"><a href="{{ player.link }}">{{ forloop.counter }}</a></td>
+                <td>{{ player.timestamp|naturaltime }}</td>
+                <td>({{ player.timestamp }})</td>
+                <td>{{ player.message }}</td>
+                <td>{{ player.programme }}</td>
+            </tr>
+        {% empty %}
+            <tr><td colspan="6">No activity<td></tr>
+        {% endfor %}
+    </table>
+</div>
+{% endblock content %}
+
+{% block javascript %}
+{{ block.super }}
+<script type="text/javascript">
+        $(document).ready(function() {
+  $('[data-toggle="popover"]').popover();
+})
+</script>
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Programme email for" %} {{ programme.name }}{% endblock title %}
+
+{% block nav %}{% with section="programmes" %}{{ block.super }}{% endwith %}{% endblock nav %}
+
+{% block content %}
+    <h2>Configure the email content for {{ programme.name }}</h2>
+    <form action="" method="post">{% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn">Create</button>
+    </form>
+    </br>
+    <a href="{% url 'programme:detail' programme.id %}" class="btn">Cancel</a>
+{% endblock content %}
+

@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Deactivate user" %} {{ object }}{% endblock title %}
+
+{% block nav %}{% with section="users" %}{{ block.super }}{% endwith %}{% endblock nav %}
+
+{% block content %}
+    <h2>Deactivate User</h2>
+    <p>Deactivating <strong>{{ object.name }} ({{ object.email }})</strong> will:</p>
+    <ul>
+        <li>Prevent them from logging in to the DataHub.
+        <li>Prevent them from viewing or managing any programmes.
+        <li>Prevent them from viewing or modifying any candidate data.
+    </ul>
+    <p>We will retain all logging, auditing and other data associated with them.</p>
+    <p>This action cannot be undone.</p>
+    <br>
+    <form action="" method="post">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger">Deactivate User</button>
+        <a href="{% url 'users:manage' %}" class="btn">Cancel</a>
+    </form>
+{% endblock content %}

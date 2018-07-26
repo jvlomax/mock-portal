@@ -1,0 +1,64 @@
+{% extends "programme/base.html" %}
+{% load staticfiles i18n crispy_forms_tags %}
+
+{% block title %}{% trans "Create programme" %}{% endblock title %}
+
+{% block nav %}{% with section="programmes" %}{{ block.super }}{% endwith %}{% endblock nav %}
+
+{% block breadcrumbs %}
+    {{ block.super }} &raquo; Create programme
+{% endblock breadcrumbs %}
+
+{% block programme %}
+{% if company %}
+    <h3>{{ company }}</h3>
+    <hr>
+{% endif %}
+{% endblock programme %}
+
+{% block content %}
+    {% include "includes/datepicker.html" %}
+    {% if form.errors %}
+        <div class="alert alert-danger">
+            <p>Please correct errors below</p>
+        </div>
+    {% endif %}
+    <h2>Create Programme</h2>
+
+<form method="post">
+
+    {% crispy form %}
+    <div id="div_id_game_levels_0" class="form-group{% if form.game_levels.errors %} has-error" style="color:#a94442;{% endif %}">
+        {{ form.game_levels.label_tag }}
+        <strong>{{ form.game_levels.errors }}</strong>
+        {{ form.game_levels }}
+    </div>
+<button type="submit" class="btn">Create</button>
+<a class="btn" href="{% url 'programme:index' %}">Cancel</a>
+</form>
+
+{% endblock content %}
+
+{% block javascript %}
+    {{ block.super }}
+    <script type="text/javascript" src="/static/sortedm2m/widget.js"></script>
+    <link href="/static/sortedm2m/widget.css" type="text/css" media="screen" rel="stylesheet" />
+
+    <script type="text/javascript">
+        var categories = JSON.parse("{{ form.sales_demo_categories }}");
+        // If the category changes to something other than a sales demo, show
+        // the survey_url and survey_outgoing_url fields
+        $("#id_category").on("change", function() {
+            // Convert category field string value to int and compare to sales demo keys. Sales demos cannot set surveys
+            if (categories.indexOf(+this.value) !== -1) {
+                $("#div_id_survey_url").fadeOut("fast");
+                $("#div_id_survey_outgoing_url").fadeOut("fast");
+            }
+            else {
+                $("#div_id_survey_url").fadeIn("fast");
+                $("#div_id_survey_outgoing_url").fadeIn("fast");
+            }
+        });
+
+    </script>
+{% endblock javascript %}

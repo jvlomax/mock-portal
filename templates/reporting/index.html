@@ -1,0 +1,129 @@
+{% extends "reporting/base.html" %}
+
+{% block css %}
+    {{ block.super }}
+    <style>
+        /* Fix btn-group wrapping in tables */
+        .btn-group {
+            display: flex;
+        }
+    </style>
+{% endblock css %}
+
+{% block breadcrumbs %}{% endblock breadcrumbs %}
+
+{% block content %}
+    <div class="container">
+        <div class="alert alert-info">
+            Please <a href="https://arcticshores.atlassian.net/wiki/display/GEN/Report+Customisation">
+            consult the Wiki Report Customisation Guide</a> to find out what can be customised, and
+            how to customise it.
+        </div>
+
+        <div class="row">
+            <h3 class="col-sm-2">Reports</h3>
+            <div class="col-sm-3 pull-right text-right">
+                <a class="btn" href="{% url 'reporting:create' %}">Create Report</a> <br>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col col-sm-12">
+                <p>You may preview existing reports, or create a customised version of any existing report</p>
+            </div>
+        </div>
+
+        <div class="panel-group" id="accordion">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h4 class="panel-title">
+                        <span class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapse1">
+                            How do report previews work?
+                        </span>
+                    </h4>
+                </div>
+                <div id="collapse1" class="panel-collapse collapse">
+                    <div class="panel-body">
+                        The default preview is in English.
+                        To check the report for the language of your programme you can use the advanced preview.
+                        If a translation is not available for say Spanish (Spain), then we automatically
+                        fall back to Spanish (Other). If there is no translation for Spanish at all
+                        then we fall back to English.
+                        <br/>
+                        The preview uses a random set of data for George Clooney and is appropriate to show to clients.
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h4 class="panel-title">
+                        <span class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapse2">
+                            What is a "game default" report?
+                        </span>
+                    </h4>
+                </div>
+                <div id="collapse2" class="panel-collapse collapse">
+                    <div class="panel-body">
+                        If a report is set to be the game default report then we will use this candidate report
+                        automatically for that particular game.
+                        For general reports that are not for a particular game, e.g. the Manager's Report, this means
+                        that the programme will use the report automatically (regardless of the game's selected).
+                        The reports used can be changed at-will through the programme configuration.
+                    </div>
+                </div>
+            </div>
+
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h4 class="panel-title">
+                        <span class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapse3">
+                            What is a report's "company"?
+                        </span>
+                    </h4>
+                </div>
+                <div id="collapse3" class="panel-collapse collapse">
+                    <div class="panel-body">
+                        If a company is configured for a particular report, then this report will only be visible
+                        to programmes for that company.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    	<table class="table table-hover">
+            <tr>
+                <th>Report</th>
+                <th>Game</th>
+                <th>Company</th>
+                <th>Game Default</th>
+                <th>Download Report Preview</th>
+            </tr>
+            {% for report in reports %}
+                <tr>
+                    <td>
+                        {# Only custom reports can be customised #}
+                        {% if report.custom %}
+                            <a href="{% url 'reporting:update' report.pk %}">{{ report.name }}</a>
+                        {% else %}
+                            {{ report.name }}
+                        {% endif %}
+                    </td>
+                    <td>{{ report.game }}</td>
+                	<td>{{ report.company }}</td>
+                	<td><span class="glyphicon glyphicon-{% if report.game_default %}ok{% else %}remove{% endif %}"></span></td>
+                    <td>
+                        <div class="btn-group">
+                            <a href="{% url 'reporting:preview' report.pk %}" class="btn btn-xs" role="button">
+                                <span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span> Quick
+                            </a>
+                            <a href="{% url 'reporting:advanced-preview' report.pk %}" class="btn btn-xs" role="button">
+                                <span class="glyphicon glyphicon-cog" aria-hidden="true"></span> Advanced
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+{% endblock content %}

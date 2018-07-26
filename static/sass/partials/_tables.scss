@@ -1,0 +1,10 @@
+.odd { background-color: #f6f6f6; }
+.table-hover#p-table tbody tr:hover td { background: #effdff; }
+#p-table thead a:hover { color: #222; }
+#p-table thead { background-color: #f6f6f6; }
+#p-table th a {
+    font-size: 14px;
+    font-family: "Roboto", "Lucida Grande", Verdana, Arial, sans-serif;
+    text-transform: uppercase;
+}
+#p-table th a { border-bottom: 0 !important; color: #666;}

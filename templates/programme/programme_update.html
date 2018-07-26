@@ -1,0 +1,99 @@
+{% extends "programme/base.html" %}
+{% load i18n crispy_forms_tags %}
+
+{% block title %}{% trans "Edit programme" %} {{ programme.name }}{% endblock title %}
+
+{% block nav %}{% with section="programmes" %}{{ block.super }}{% endwith %}{% endblock nav %}
+
+{% block breadcrumbs %}
+    {{ block.super }} &raquo; <a href="{% url 'programme:detail' programme.id %}">{{ programme.name }}</a> &raquo; Edit programme
+{% endblock breadcrumbs %}
+
+{% block programme %}
+    {{ block.super }}
+    {% if form.errors %}
+        <div class="alert alert-danger">
+            <p>Please correct errors below</p>
+        </div>
+    {% endif %}
+    <h3>Update Programme</h3>
+    <br>
+{% endblock programme %}
+
+{% block content %}
+    {% include "includes/datepicker.html" %}
+    <form method="post" id="programme-update-form">
+
+        {% crispy form %}
+        <div id="div_id_game_levels_0" class="form-group{% if form.game_levels.errors %} has-error" style="color:#a94442;{% endif %}">
+            {{ form.game_levels.label_tag }}
+            <strong>{{ form.game_levels.errors }}</strong>
+            {{ form.game_levels }}
+        </div>
+
+        <button id="update-btn" type="submit" class="btn">Update</button>
+        <a class="btn" href="{% url 'programme:detail' programme.id %}">Cancel</a>
+    </form>
+    {% include "programme/modals/confirm_norm_group_edit.html" %}
+{% endblock content %}
+
+{% block javascript %}
+    {{ block.super }}
+    <script language="JavaScript">
+        $('#hint_id_games').append(' (<a href="{% url 'admin:campaign_programme_change' programme.pk %}">link</a>)')
+
+        // Convert norm group description into nicer tooltips
+        var $ngElements = $('[name="norm_groups"]');
+        $ngElements.parent().attr('title', function() {
+            return $(this).text().split('(Description: ')[1].trim().slice(0, -1);
+        });
+
+        // Remove description from text
+        $ngElements.parent().contents().filter(function(){
+          return this.nodeType == 3;
+        }).map(function() {
+            this.nodeValue = this.nodeValue.split('(Description: ')[0];
+        });
+
+        // Enable bootstrap tooltip
+        $ngElements.parent().attr('data-toggle', 'tooltip');
+        $('[data-toggle="tooltip"]').tooltip();
+
+        var $form = $("[id=programme-update-form]");
+        $form.children("[id=update-btn]").click(function(event) {
+            var norm_groups = $("[name=norm_groups]");
+            norm_groups.each(function(index) {
+                if ($(this).prop("defaultChecked") !== $(this).prop("checked")) {
+                    event.preventDefault();
+                    showModal('#confirmNormGroupChange');
+                    return false;
+                }
+            });
+        });
+        var categories = JSON.parse("{{ form.sales_demo_categories }}");
+        var $category = $("#id_category");
+        // If the programme is a sales demo hide survey_url and survey_outgoing_url fields
+        if (categories.indexOf(parseInt($category.val())) !== -1) {
+            $("#div_id_survey_url").hide();
+            $("#div_id_survey_outgoing_url").hide();
+        }
+
+        // If the category changes to something other than a sales demo, show
+        // the survey_url and survey_outgoing_url fields
+        $category.on("change", function() {
+            // Convert category field string value to int and compare to sales demo keys. Sales demos cannot set surveys
+            if (categories.indexOf(+this.value) !== -1) {
+                $("#div_id_survey_url").fadeOut("fast");
+                $("#div_id_survey_outgoing_url").fadeOut("fast");
+            }
+            else {
+                $("#div_id_survey_url").fadeIn("fast");
+                $("#div_id_survey_outgoing_url").fadeIn("fast");
+            }
+        });
+    </script>
+    <script type="text/javascript" src="/static/sortedm2m/widget.js"></script>
+    <script type="text/javascript" src="/static/sortedm2m/jquery-ui.js"></script>
+    <link href="/static/sortedm2m/widget.css" type="text/css" media="screen" rel="stylesheet" />
+
+{% endblock javascript %}

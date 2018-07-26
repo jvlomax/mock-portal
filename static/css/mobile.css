@@ -1,0 +1,104 @@
+* {
+    /* Prevent padding and border increasing width. */
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+body { font-family: "Noto Sans", Helvetica, sans-serif; color: #333; width: 90%; margin: auto; padding: 0; }
+#footer { font-size: smaller; text-align: center; margin-bottom: 10px; }
+.logo { display: block; margin: 10px auto; }
+.heading, .signoff { margin-top: 10px; margin-bottom: 10px; }
+.signoff { font-style: italic; }
+[class^="error"] { color: #C00; list-style-type: none; }
+[id^="error"] { color: #C00; list-style-type: none; }
+.lumina { background: #EEE; }
+
+/* Responsive fields. Set size and field alignment. */
+select, textarea, input[type='text'], input[type='password'],
+input[type='search'], input[type='number'], input[type='submit'],
+input[type='button'], input[type='email'], input[type='url'] {
+    margin-top: 10px;
+    margin-bottom: 20px;
+    width: 100%;
+    padding: 15px;
+    border-radius:5px;
+    border:1px solid #00c0c0;
+    font-size: large;
+}
+
+select:focus, input:focus, textarea:focus { border-color: #4697e4; }
+textarea { resize:none; }
+input[type=submit] { background-color: #00c0c0; }
+
+/* Space at the below each bank of radio buttons */
+label.radio { display: block; }
+div.controls { margin-bottom: 8px; }
+
+.radio-btn-group {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.radio-btn-label {
+  width: 100%;
+  height: 40px;
+  display: block;
+  cursor: pointer;
+  /* top | right | bottom | left */
+  /* prevent double-border on bottom side */
+  margin: 0 0 -1px 0;
+}
+
+.radio-btn-label input[type='radio'] {
+  margin: 0 0 0 15px;
+}
+
+.radio-btn-label input[type='radio']:checked + div {
+  background-color: #00c0c0;
+}
+
+.radio-btn-label input[type='radio'] + div {
+  border: solid 1px #00c0c0;
+  line-height: 40px;
+  font-size: 0.8em;
+  height: 100%;
+  padding-left: 40px;
+  margin-top: -30px;
+}
+
+.radio-btn-label:first-child div {
+  /* top-left | top-right | bottom-right | bottom-left */
+  border-radius: 5px 5px 0 0;
+}
+
+.radio-btn-label:last-child div {
+  border-radius: 0 0 5px 5px;
+}
+
+@media only screen and (min-width: 900px) {
+  .radio-btn-group {
+    display: flex;
+    display: -webkit-flex;
+  }
+  .radio-btn-label {
+    box-sizing: border-box;
+    /* top | right | bottom | left */
+    /* prevent double-border on left hand side */
+    margin: 0 0 0 -1px;
+  }
+
+  .radio-btn-label:first-child div {
+    border-radius: 5px 0 0 5px;
+  }
+
+  .radio-btn-label:last-child div {
+    border-radius: 0 5px 5px 0;
+  }
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+    width: auto\9;
+}

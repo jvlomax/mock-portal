@@ -1,0 +1,20 @@
+<!-- Modal -->
+    <div class="modal fade" id="confirmCancelChange" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header text-center">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title">Confirm cancel</h4>
+                </div>
+                <div class="modal-body text-center">
+                    Are you sure you want to go back without saving your changes?
+                </div>
+                <div class="modal-footer">
+                    <div class='text-center'>
+                        <a id="confirm-yes" href="{% block url %}{% endblock %}" class="btn">Yes</a>
+                        <a id="confirm-no" class="btn" href="#">No</a>
+                    </div>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->

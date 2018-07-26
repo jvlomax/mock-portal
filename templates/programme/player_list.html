@@ -1,0 +1,304 @@
+{% extends "programme/base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Candidate list" %}{% endblock title %}
+
+{% block nav %}{% with section="programmes" %}{{ block.super }}{% endwith %}{% endblock nav %}
+
+{% block breadcrumbs %}
+    {{ block.super }} &raquo; <a href="{% url 'programme:detail' programme.id %}">{{ programme.name }}</a> &raquo; All candidates
+{% endblock breadcrumbs %}
+
+{% block programme %}
+    {{ block.super }}
+    <h3>Candidates</h3>
+{% endblock programme %}
+
+{% block content %}
+    <div class="player-list">
+        <div class="row filtering">
+            <div class="col-md-4">
+                {% include 'programme/_player_list_pagination.html' %}
+            </div>
+            <div class="col-md-4">
+                Filter:
+                <a id="game-completed-all" href="?{% if filter_querystring %}{{ filter_querystring }}&{% endif %}game_completed=all" class="link">
+                    All
+                </a>
+                <span class="splitter">|</span>
+                <a id="game-completed-not-started" href="?{% if filter_querystring %}{{ filter_querystring }}&{% endif %}game_completed=not_started" class="link" role="button">
+                    Not Started
+                </a>
+                <span class="splitter">|</span>
+                <a id="game-completed-in-progress" href="?{% if filter_querystring %}{{ filter_querystring }}&{% endif %}game_completed=in_progress" class="link" role="button">
+                    In Progress
+                </a>
+                <span class="splitter">|</span>
+                <a id="game-completed-complete" href="?{% if filter_querystring %}{{ filter_querystring }}&{% endif %}game_completed=complete" class="link" role="button">
+                    Complete
+                </a>
+            </div>
+            <div class="col-md-4">
+                {% include 'programme/_player_search.html' %}
+            </div>
+        </div>
+
+        <hr>
+
+        <div class="row">
+            <div class="col-md-12">
+                {% if player_list %}
+                {% with roles_exist=programme.roles.exists %}
+                <form action="{% url 'reporting:download-reports' programme.pk %}" method="post" id="players-form">
+                    {% csrf_token %}
+                    <table class="table table-striped" id="player-table">
+                        <thead>
+                        <tr>
+                            <th><input id="selectAllPlayers" type="checkbox"></th>
+                            <th>Candidate</th>
+                            <th>Completed</th>
+                            {# Scoring fields #}
+                            {% if roles_exist %}
+                                {% if personality_roles %}
+                                    <th>Fit</th>
+                                {% endif %}
+                                {% if aptitude_roles %}
+                                    <th>Sift</th>
+                                {% endif %}
+                            {% else %}
+                                <th>Scoring</th>
+                            {% endif %}
+                            {# End scoring fields #}
+                            <th>Email</th>
+                            {% if display_client_supplied_id %}
+                                <th>Client Supplied ID</th>
+                            {% endif %}
+                            <th>Emails Sent</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for player in player_list %}
+                            {# Cache expensive queries that are used several times #}
+                            {% with games_complete=player.games_complete %}
+                                <tr id="{{ player.pk }}">
+                                    <td>
+                                        <input type="checkbox" name="players" class="selectPlayer" value="{{ player.pk }}">
+                                    </td>
+                                    <td id="player">
+                                        <a href="#" class="star" data-ajax-target="{% url 'portal-api:player-update' player.pk %}"><span class="{{ player.starred|yesno:"starred," }} glyphicon glyphicon-star"></span></a>&nbsp;
+                                        <a href="{% url 'programme:players-detail' programme.id player.player_id %}">
+                                            {{ player.label }}
+                                        </a>
+                                    </td>
+                                    <td>
+                                        {% if games_complete %}
+                                            <span class="label label-success">{% if player.games_complete_time %}{{ player.games_complete_time|date:"d M Y" }}{% else %}Complete{% endif %}</span>
+                                        {% elif player.is_expired %}
+                                            <span class="label label-default">Expired</span>
+                                        {% elif player.programme_in_progress %}
+                                            <span class="label label-warning">In progress</span>
+                                        {% else %}
+                                            <span class="label label-danger">Not started</span>
+                                        {% endif %}
+                                    </td>
+                                    {# Scoring fields #}
+                                    {% if roles_exist %}
+                                        {% if personality_roles %}
+                                            <td><span class="label label-primary">{{ player.personality_fit_scores.0.score }}</span></td>
+                                        {% endif %}
+                                        {% if aptitude_roles %}
+                                            <td><span class="label label-primary">{{ player.aptitude_sift_scores.0.score }}</span></td>
+                                        {% endif %}
+                                    {% else %}
+                                        <td>
+                                            {% if player.scores_calculated %}
+                                                <span class="label label-success">Complete</span>
+                                            {% endif %}
+                                        </td>
+                                    {% endif %}
+                                    {# End scoring fields #}
+                                    <td>
+                                        {% if player.email %}
+                                            {{ player.email }}
+                                        {% endif %}
+                                    </td>
+                                    {% if display_client_supplied_id %}
+                                        <td>
+                                        {% if player.client_supplied_id %}
+                                            {{ player.client_supplied_id }}
+                                        {% endif %}
+                                        </td>
+                                    {% endif %}
+                                    <td>
+                                        {% if player.invitation_email_logs %}
+                                            <small>Invitation:</small>
+                                            <span class="label label-success">{{ player.invitation_email_logs.0.timestamp|date:"d M Y" }}</span>
+                                            {% if not games_complete %}
+                                                 <small>Reminder:</small>
+                                                <a id="sendReminder-{{ player.pk }}"
+                                                    title="{% if player.reminder_email_logs %}{% trans 'Send another reminder' %}{% else %}{% trans 'Send reminder' %}{% endif %}"
+                                                    href="{% url 'programme:players-email' programme.id player.player_id reminder_email_slug %}?{{ request.GET.urlencode }}"
+                                                >
+                                                    <span class="glyphicon glyphicon-envelope"></span>
+                                                </a>
+                                            {% endif %}
+                                        {% elif not games_complete %}
+                                            <small>Invitation:</small>
+                                                {% csrf_token %}
+                                                {# As forms cannot be nested we must create the email invitations form below for each player #}
+                                                {# Note that the link corresponds to the form name for each player #}
+                                                <a href="javascript: document.forms.namedItem('email-invite-form-{{ player.pk }}').submit()">
+                                                    <span class="glyphicon glyphicon-envelope"></span>
+                                                </a>
+                                        {% endif %}
+                                        {% if player.report_email_logs %}
+                                            <small>Report:</small>
+                                            <span class="label label-success">{{ player.report_email_logs.0.timestamp|date:"d M Y" }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if perms.metrics.delete_player %}
+                                            <a id="deletePlayer-{{ player.pk }}" href="{% url 'programme:players-delete' programme.pk player.pk %}">
+                                                <span class="glyphicon glyphicon-trash"></span>
+                                            </a>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'programme:players-update' programme.id player.pk %}" class="link" role="button">
+                                            <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
+                                            Edit
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endwith %}
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                    <div class="text-danger small" id="selectedPlayers" style="visibility: hidden;">
+                        Hidden
+                    </div>
+                    <input id="id_game" type="hidden" name="game">
+                    <input id="id_category" type="hidden" name="category">
+                    <div id="reportDownloadDropdownMenu" class="dropdown">
+                        <button class="btn btn-xs dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="true" disabled="disabled">
+                            Download Reports
+                            <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" role="menu">
+                            {% for option in report_download_options %}
+                                <li role="presentation">
+                                    <a role="menuitem" tabindex="-1" href="#" onclick="downloadReports('{{ option.category }}', {% if option.game_id %}'{{ option.game_id }}'{% else %}null{% endif %})">
+                                    <span class="glyphicon glyphicon-save"></span> {{ option.get_display_name }}
+                                    </a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </form>
+                {# Build forms to submit player invitations (down here as you cannot nest HTML forms) #}
+                {# Note that the form name corresponds to the JavaScript-based link above #}
+                {% for player in player_list %}
+                    <form name="email-invite-form-{{ player.pk }}"
+                          method="post"
+                          action="{% url 'programme:players-email' programme.id player.player_id invitation_email_slug %}?{{ request.GET.urlencode }}"
+                    >
+                        {% csrf_token %}
+                    </form>
+                {% endfor %}
+                {% endwith %}
+                {% else %}
+                    No candidates are currently in this programme.
+                {% endif %}
+            </div>
+        </div>
+
+        <hr>
+
+        <div class="row">
+            <div class="col-md-4">
+                {% include 'programme/_player_list_pagination.html' %}
+            </div>
+            <div class="col-md-8"></div>
+        </div>
+        {% include 'programme/modals/confirm_player_delete.html' %}
+        {% include 'programme/modals/confirm_send_reminder.html' %}
+    </div>
+{% endblock content %}
+
+{% block javascript %}
+    {{ block.super }}
+    <script type="text/javascript">
+        var MAX_REPORT_COUNT = 20;
+        function downloadReports(category, game_id) {
+            /* Update hidden fields in players form and submit */
+            $('#id_category').val(category);
+            $('#id_game').val(game_id);
+            $('#players-form').submit()
+        }
+
+        $(document).ready(function() {
+            /* Selected player actions */
+            var updateSelectedPlayerWidgets = function() {
+                var checkedPlayerCount = $(".selectPlayer:checked").size();
+                var selectedPlayers = $("#selectedPlayers");
+                selectedPlayers.text(checkedPlayerCount + (checkedPlayerCount == 1 ? " candidate" : " candidates") + " selected.");
+                selectedPlayers.css("visibility", checkedPlayerCount > 0 ? "visible" : "hidden");
+
+                /* Report download */
+                $('#reportDownloadDropdownMenu button').prop("disabled", checkedPlayerCount == 0 | checkedPlayerCount > MAX_REPORT_COUNT);
+                if(checkedPlayerCount > MAX_REPORT_COUNT) {
+                    selectedPlayers.text(selectedPlayers.text() + " (A maximum of " + MAX_REPORT_COUNT + " reports may be downloaded).");
+                }
+            };
+
+            $("#selectAllPlayers").change(function () {
+                $(".selectPlayer").prop("checked", $(this).prop("checked"));
+                updateSelectedPlayerWidgets();
+            });
+
+            $(".selectPlayer").change(function() {
+                var checkedPlayerCount = $(".selectPlayer:checked").size();
+                var allPlayerCount = $(".selectPlayer").size();
+                $("#selectAllPlayers").prop('checked', checkedPlayerCount == allPlayerCount);
+                updateSelectedPlayerWidgets();
+            });
+
+            /* Player deletion */
+            $("[id^=deletePlayer-], [id^=sendReminder-]").click(function(event) {
+                event.preventDefault();
+                var player_id = $(this).prop("id").split("-")[1];
+                var player_name = $("#" + player_id + " #player a").text().trim();
+                var href = $(this).attr('href');
+                var action = this.id.split("-")[0];
+                if (action == "deletePlayer") {
+                    // NOTE: selected div included at the end of the content block
+                    var modalText = "Are you sure you want to delete candidate <strong> " + player_name + "</strong>?"
+                    showModal('#confirmPlayerDeleteModal', modalText, function(event) {
+                        var deletePlayerForm = $('#playerDeleteForm');
+                        deletePlayerForm.attr('action', href);
+                        deletePlayerForm.submit();
+                    });
+                } else if (action == "sendReminder") {
+                    var modalText = "Are you sure you want to send <strong>" + player_name + "</strong> another reminder email?";
+                    var href = $(this).attr('href');
+                    showModal('#confirmSendReminderModal', modalText, function(event) {
+                        {# Modify the form's action URL to correspond to the player #}
+                        $('#confirmSendReminderModal #confirm-yes').attr('action', href);
+                    });
+                }
+            });
+
+            /* Player star */
+            $("a.star").click(toggleStar);
+        });
+
+        var game_completed_filter_button = 'game-completed-all';
+        var game_completed_filter = getParameterByName('game_completed');
+        var filters = ['not_started', 'in_progress', 'complete'];
+        if(game_completed_filter !== '' && $.inArray(game_completed_filter, filters) != -1) {
+            game_completed_filter_button = 'game-completed-' + game_completed_filter.replace('_', '-');
+        }
+        $("#" + game_completed_filter_button).toggleClass('active');
+    </script>
+{% endblock javascript %}

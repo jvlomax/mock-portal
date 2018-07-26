@@ -1,0 +1,14 @@
+<h2><strong>Warning</strong></h2>
+
+<p>There has been an unknown error when attempting to calculate psychometric scores for player
+    <a href="{{ url }}"><strong>{{ player.player_key }}</strong>.</a></p>
+<p>The DataHub development team have been notified of this error.</p>
+<p>Please see details below:</p>
+
+<ul>
+    <li><a href="{{ url }}">Player Key: {{ player.player_key }}</a></li>
+    <li>Programme: {{ player.programme }}</li>
+    <li>Company: {{ player.programme.company }}</li>
+</ul>
+
+{{ url }}

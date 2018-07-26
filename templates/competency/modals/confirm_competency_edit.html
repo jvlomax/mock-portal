@@ -1,0 +1,15 @@
+{% extends "competency/modals/extend/confirm_edit.html" %}
+
+{% block title %}
+    {% if is_new_competency %}
+        Confirm new Competency
+    {% else %}
+        Confirm changing the Competency
+    {% endif %}
+{% endblock %}
+
+{% block body %}
+    <p>
+        <strong>IMPORTANT:</strong> editing this competency will not re-scoring existing players
+    </p>
+{% endblock %}

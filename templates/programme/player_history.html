@@ -1,0 +1,78 @@
+{% extends "programme/base.html" %}
+{% load i18n %}
+{% load staticfiles i18n %}
+
+{% block title %}{% trans "Player details" %}{% endblock title %}
+{% block nav %}{% with section="programmes" %}{{ block.super }}{% endwith %}{% endblock nav %}
+
+{% block breadcrumbs %}
+    {{ block.super }}
+    &raquo; <a href="{% url 'programme:detail' programme.id %}">{{ programme.name }}</a>
+    &raquo; <a href="{% url 'programme:players-list-view' player.programme.id %}">All players</a>
+    &raquo; <a href="{{ player.get_absolute_path }}">{{ player.label }}</a>
+    &raquo; Historical Records
+{% endblock breadcrumbs %}
+
+{% block programme %}
+    {{ block.super }}
+{% endblock programme %}
+
+{% block content %}
+    <div class="content">
+        <div class="row">
+            <div class="col-xs-12">
+                <h1>
+                    Historical records associated with the player
+                    <small><span class="label label-info">Arctic Shores Superusers</span></small>
+                </h1>
+                <p>
+                    A small page to show data associated with this player that has been deleted.
+                    Superuser pending discussion I suppose.
+                </p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-12">
+                <h2>Historical Session Records</h2>
+                <ul>
+                    {% for session_info in historical_sessions %}
+                        <li>
+                            Record of Session <em>{{ session_info.session.session_key }}</em> that was created on {{ session_info.session.created }}
+                            <ul>
+                                <li>{{ session_info.session.game }}
+                                <li>
+                                    {% if session_info.session.session_complete %}
+                                        Player finished the game at {{ session_info.session.session_complete_time }}
+                                    {% else %}
+                                        Player has not completed the game
+                                    {% endif %}
+                                <li>{{ session_info.normed_scores|length }} trait score records found
+                                    <ul>
+                                        {% for normed_score in session_info.normed_scores %}
+                                            <li>{{ normed_score }} with norm_group={{ normed_score.norm_group }}
+                                        {% endfor %}
+                                    </ul>
+
+                                {# Download report if possible - it isn't #}
+                                {% if session_info.session_complete and session_info.normed_scores|length %}
+                                {% endif %}
+                            </ul>
+                            <br>
+                            Unfortunately, you cannot download the historical reports or restore this session yourself.
+                    {% empty %}
+                        <li>There are no records of historical sessions
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="col-xs-12">
+                <h2>Other historical data</h2>
+                <ul>
+                    <li>We do not show <em>any</em> changes made to the player whatsoever
+                    <li>Historical sessionevent records are not kept
+                    <li>Historical raw score records are not shown
+                    <li>Historical fit score records are not shown
+                </ul>
+            </div>
+        </div>
+    </div>
+{% endblock content %}

@@ -1,0 +1,142 @@
+{% extends "programme/base.html" %}
+{% load i18n %}
+{% load staticfiles i18n %}
+
+{% block title %}{% trans "Player details" %}{% endblock title %}
+{% block nav %}{% with section="programmes" %}{{ block.super }}{% endwith %}{% endblock nav %}
+
+{% block breadcrumbs %}
+    {{ block.super }}
+    &raquo; <a href="{% url 'programme:detail' programme.id %}">{{ programme.name }}</a>
+    &raquo; <a href="{% url 'programme:players-list-view' player.programme.id %}">All players</a>
+    &raquo; <a href="{{ player.get_absolute_path }}">{{ player.label }}</a>
+    &raquo; Possible Scoring Errors
+{% endblock breadcrumbs %}
+
+{% block programme %}
+    {{ block.super }}
+{% endblock programme %}
+
+{% block content %}
+    <div class="content">
+        <div class="row">
+            <div class="col-xs-12">
+                <img style="position: absolute; right:0" src="{% static 'images/inspector-scorer-jy7a.jpg' %}">
+                <h1>Inspector Scorer</h1>
+                <p style="margin-right: 300px;">
+                    Inspector Scorer's age may be measured in months but rest assured he will do his very best to
+                    figure out what went wrong when trying to score this player! If his best just isn't good enough,
+                    then a DataHub developer will usually be able to sort you out.
+                </p>
+            </div>
+        </div>
+
+        {% if request.user.is_superuser %}
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="panel panel-default" style="margin-right: 300px;">
+                        <div class="panel-heading">
+                            <h3 class="panel-title">
+                                Norm Group Selector
+                                <span class="label label-info">Superuser</span>
+                            </h3>
+                        </div>
+                        <div class="panel-body">
+                            <p></p>
+                            {% if programme_norm_groups %}
+                                <p>Norm Groups attached to this programme:</p>
+                                <ul>
+                                    {% for norm_group in programme_norm_groups %}
+                                        <li><a href="?norm_group={{ norm_group.id }}">{{ norm_group }}</a></li>
+                                    {% endfor %}
+                                </ul>
+                            {% else %}
+                                <p>This player does not have scores for Norm Groups attached to this programme.</p>
+                            {% endif %}
+                            {% if other_norm_groups %}
+                                <p>Other Norm Groups with scores:</p>
+                                <ul>
+                                    {% for norm_group in other_norm_groups %}
+                                        <li><a href="?norm_group={{ norm_group.id }}">{{ norm_group }}</a></li>
+                                    {% endfor %}
+                                </ul>
+                            {% else %}
+                                <p>This player does not have scores for any other Norm Group.</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
+        {% for session, info in scoring_errors.items %}
+            <div class="row">
+                <div class="col-xs-12">
+                    <h2>{{ session.game.name }}</h2>
+                </div>
+                <div class="col-xs-12">
+                    {% if not info.general_errors and not info.level_errors and not info.trait_errors and not info.riasec_errors %}
+                        <p>There are no (detected) scoring errors.</p>
+                    {% else %}
+                        <p>We are considering the Norm Group <strong>{{ info.norm_group }}</strong></p>
+                    {% endif %}
+                </div>
+
+                {% if info.general_errors %}
+                    <div class="col-xs-12">
+                        <h3>General Errors</h3>
+                        {% for error in info.general_errors %}
+                            <p>{{ error|safe|linebreaksbr }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                {% if info.level_errors %}
+                    <div class="col-xs-12">
+                        <h3>Errors on Individual Levels</h3>
+                        {% for level, errors in info.level_errors.items %}
+                            <h4>{{ level.name }}</h4>
+                            <p>{{ error|linebreaksbr }}</p>
+                            {% for error in errors %}
+                                <p>{{ error|safe|linebreaksbr }}</p>
+                            {% endfor %}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                {% if info.trait_errors %}
+                    <div class="col-xs-12">
+                        <h3>Errors calculating Trait Scores</h3>
+                        {% for trait, error in info.trait_errors.items %}
+                            <h4>{{ trait.name }}</h4>
+                            <p>{{ error|safe|linebreaksbr }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                {% if info.riasec_errors %}
+                    <div class="col-xs-12">
+                        <h3>Errors calculating RIASEC scores</h3>
+                        {% for key, error in info.riasec_errors.items %}
+                            <h4>{{ key.name }}</h4>
+                            <p>{{ error|safe|linebreaksbr }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        {% endfor %}
+
+        {% if fit_errors %}
+            <div class="row">
+                <div class="col-xs-12">
+                    <h2>Errors calculating Fit Scores</h2>
+                </div>
+                {% for fit_profile, error in fit_errors.items %}
+                    <div class="col-xs-12">
+                        <h3>{{ fit_profile.name }}</h3>
+                        <p>{{ error|safe|linebreaksbr }}</p>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+{% endblock content %}

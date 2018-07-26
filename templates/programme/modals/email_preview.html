@@ -1,0 +1,23 @@
+<div class="modal fade bs-email-modal" tabindex="-1" role="dialog" aria-labelledby="emailPreviewModelLabel" aria-hidden="true">
+  	<div class="modal-dialog modal-lg">
+    	<div class="modal-content">
+	    	<div class="modal-header text-center">
+		      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+		      <h4 class="modal-title">{{ email.get_email_type_display }}</h4>
+		    </div>
+		    <div class="modal-body">
+			    <div class="row">
+	                <div class="col-xs-10">
+	                    <strong>From:</strong> {{ email.from_email }}<br>
+	                    <strong>To:</strong> {{ player.email }}<br>
+	                    <strong>Subject:</strong> {{ email.subject }}
+	                </div>
+	            </div>
+	            <hr>
+                <div class="email-body">
+	                {{ email.body|safe }}
+                </div>
+		    </div>
+    	</div>
+  	</div>
+</div>

@@ -1,0 +1,764 @@
+{% extends "programme/base.html" %}
+{% load staticfiles i18n jinjas_must_die %}
+
+{% block title %}{% trans "Programme" %} {{ programme.name }}{% endblock title %}
+
+{% block nav %}{% with section="programmes" %}{{ block.super }}{% endwith %}{% endblock nav %}
+
+{% block breadcrumbs %}
+    {{ block.super }} &raquo; {{ programme.name }}
+{% endblock breadcrumbs %}
+
+{% block css %}
+    {{ block.super }}
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-switch/3.3.4/css/bootstrap3/bootstrap-switch.min.css"
+        rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-switch/3.3.4/js/bootstrap-switch.min.js"></script>
+{% endblock %}
+
+{% block programme %}
+
+    <div class="row" style="margin-top: 10px;">
+        {% for alert_type, alerts in all_alerts.items %}
+            {% if alerts %}
+                {% for key, alert in alerts.items %}
+                    <div class="col-xs-12">
+                        <div class="alert alert-{{ alert_type }}" id="{{ key }}">
+                            <strong>Warning</strong>&emsp;{{ alert }}
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endfor %}
+    </div>
+
+    <div class="row">
+        <div class="col-xs-5">
+            <h3 class="programme-detail-title">
+                {% if programme.is_special %}
+                    <span class="label label-success">{{ programme.name }}</span>
+                {% else %}
+                    {{ programme.name }}
+                {% endif %}
+                {% if user_can_edit %}
+                    <a href="{% url 'programme:update' programme.id %}" class="link" role="button">
+                        <span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit
+                    </a>
+                    &nbsp;<a id="cloneProgramme" href="{% url 'programme:clone' programme.id  %}" class="link" style="display: inline;">
+                        <span class="glyphicon glyphicon-copy" aria-hidden="true"></span> Copy
+                    </a>
+                {% endif %}
+                {% if programme.num_players == 0 %}
+                    &nbsp;<a id="deleteProgramme-{{ programme.pk }}" href="{% url 'programme:delete' programme.pk %}" class="link" style="color: red">
+                        <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Delete
+                    </a>
+                {% endif %}
+                <br>
+                <small>{{ programme.company.name }}</small>
+            </h3>
+            {% if programme.locale != 'en_GB' %}
+                <span class="label label-success">Locale: {{ programme.get_locale_display }}</span>
+            {% endif %}
+        </div>
+        <div class="col-xs-7">
+            <div class="row">
+                <div class="col-xs-7">
+                    <br>
+                    <div class="title">Candidates completed:</div>
+                    <div class="progress">
+                        <div class="progress-bar" role="progressbar"
+                            aria-valuemin="0"
+                            aria-valuenow="{{ programme.no_played|percentage:programme.num_players }}"
+                            aria-valuemax="{{ programme.num_players }}"
+                            style="min-width: 2em; width: {{ programme.no_played|percentage:programme.num_players }}%">
+                            {{ programme.no_played }}/{{ programme.num_players }}
+                        </div>
+                    </div>
+                </div>
+                {% if user_can_edit %}
+                    <br>
+                    <div class="col-xs-5 programme-status">
+                        Programme Status:
+                        <br>
+                        <input id="programme-status" name="programme-status-checkbox" type="checkbox"
+                               data-on-color="success" data-on-text="ACTIVE" data-off-color="danger"
+                               data-off-text="INACTIVE" data-size="small" data-label-width="1"
+                               {% if programme.active %}checked="checked"{% endif %}>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-5">
+            <span class="text-muted">{{ programme.description|linebreaksbr }}</span>
+        </div>
+        <div class="col-xs-2">
+            <strong>Role sector:</strong><br>
+            <strong>Education level:</strong><br>
+            <strong>Role type:</strong><br>
+            <strong>Location:</strong><br>
+            <strong>Assessment Context:</strong>
+        </div>
+        <div class="col-xs-5">
+            {{ programme.get_role_sector_display|default:"Not set" }}<br>
+            {{ programme.get_education_level_display|default:"Not set" }}<br>
+            {{ programme.get_role_type_display|default:"Not set" }}<br>
+            {{ programme.get_location_display|default:"Not set" }}<br>
+            {{ programme.get_assessment_context_display|default:"Not set" }}
+        </div>
+    </div>
+{% endblock programme %}
+
+{% block content %}
+<hr>
+<div class="row">
+    <div class="col-xs-12">
+    {% if not programme.num_players %}
+        {% if programme.generic_player_key %}
+            <p>Generic Player Key: <span class="label label-default">{{ programme.generic_player_key }}</span></p>
+            <p>Generic Player Key Expiry Date: <span class="label label-default">
+                {% if programme.generic_player_key_expiry_date %}
+                    {{ programme.generic_player_key_expiry_date }}
+                {% else %}
+                    No Expiry
+                {% endif %}
+            </span></p>
+        {% endif %}
+        <span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+        No candidates belong to this programme yet.
+        <br>
+        <div class="add-players">
+            <a class="btn-icon-large" href="{% url 'programme:players-upload-form' programme.id %}" role="button">
+                <p><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></p>
+                <p>Add candidates</p>
+            </a>
+        </div>
+    {% else %}
+
+        <div class="col-12">
+            <h4>Candidates:</h4>
+            {% if programme.generic_player_key %}
+                <p>Generic Player Key: <span class="label label-default">{{ programme.generic_player_key }}</span></p>
+                <p>Generic Player Key Expiry Date: <span class="label label-default">
+                {% if programme.generic_player_key_expiry_date %}
+                    {{ programme.generic_player_key_expiry_date }}
+                {% else %}
+                    No Expiry
+                {% endif %}
+                </span></p>
+            {% endif %}
+            <p>A total of <strong>{{ programme.num_players }}</strong> candidate{{ programme.num_players|pluralize }}
+                belong{{ programme.num_players|pluralize:"s," }} to this programme of which
+                <strong>{{ programme.no_played }}</strong> ha{{ programme.no_played|pluralize:"s,ve" }} completed the
+                assessment with <strong>{{ players_with_scores_count }}</strong>
+                result{{ players_with_scores_count|pluralize }} calculated.</p>
+        </div>
+        <div class="row">
+            <div class="view-players">
+                <a class="btn-icon-large" href="{% url 'programme:players-list-view' programme.id %}">
+                    <p><span class="glyphicon glyphicon-user" aria-hidden="true"></span></p>
+                    <p>View candidates</p>
+                    <span class="badge">
+                        {{ programme.num_players }}
+                    </span>
+                </a>
+            </div>
+
+            <div class="add-players">
+                <a class="btn-icon-large" href="{% url 'programme:players-upload-form' programme.id %}" role="button">
+                    <p><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></p>
+                    <p>Add candidates</p>
+                </a>
+            </div>
+
+            <div class="export-players">
+                <a class="btn-icon-large" href="{% url 'programme:players-export-form' programme.id %}" class="">
+                    <p><span class="glyphicon glyphicon-save"></span></p>
+                    <p>Export candidates</p>
+                </a>
+            </div>
+
+            <div class="remind-players">
+                {% with reminder_emails_remaining=programme.reminder_emails_remaining %}
+                    <button
+                        id="sendReminderEmails"
+                        type="button"
+                        class="btn-icon-large btn-icon-large-counter"
+                        data-toggle="modal"
+                        data-target="#emailRemindersModal"
+                        {% if reminder_emails_remaining > 0 %}
+                            title="{{ reminder_emails_remaining }} player{{ reminder_emails_remaining|pluralize }} have been sent an invitation email but have not yet completed the programme"
+                        {% endif %}
+                        {% if reminder_emails_remaining == 0 %}
+                            disabled
+                        {% endif %}
+                    >
+                        <p><span class="glyphicon glyphicon-send"></span></p>
+                        <p>Email reminders</p>
+                        <span class="badge">
+                            {{ reminder_emails_remaining }}
+                        </span>
+                    </a>
+                    </button>
+
+                    {% include 'programme/modals/confirm_email_reminders.html' with programme=programme remaining=reminder_emails_remaining csrf_token=csrf_token only %}
+                {% endwith %}
+            </div>
+
+            <div class="invite-players">
+                {% with invitation_emails_remaining=programme.invitation_emails_remaining %}
+                    <button
+                        id="sendInvitationEmails"
+                        type="button"
+                        class="btn-icon-large btn-icon-large-counter {% if invitation_emails_remaining == 0 or programme.email_invitation_job_status == 'pending' %}disabled{% endif %}"
+                        data-toggle="modal"
+                        data-target="#emailInvitationsModal"
+                        {% if invitation_emails_remaining > 0 %}
+                            title="{{ invitation_emails_remaining }} player{{ invitation_emails_remaining|pluralize }} ha{{ invitation_emails_remaining|pluralize:"s,ve" }} not yet been sent an invitation email"
+                        {% endif %}
+                        {% if invitation_emails_remaining == 0 or programme.email_invitation_job_status == 'pending' %}
+                            disabled
+                        {% endif %}
+                    >
+                        <p><span class="glyphicon glyphicon-send"></span></p>
+                        <p>Email invitations</p>
+                        {% if programme.email_invitation_job_status == 'pending' %}
+                            <p><span class="label label-warning">Pending</span></p>
+                        {% else %}
+                            <p><span class="badge">{{ invitation_emails_remaining }}</span></p>
+                        {% endif %}
+                    </a>
+                    </button>
+
+                    {% include 'programme/modals/confirm_email_invitations.html' with programme=programme remaining=invitation_emails_remaining csrf_token=csrf_token only %}
+                {% endwith %}
+            </div>
+
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-xs-12">
+                <h4>Candidate Assessment Deadline:</h4>
+                {% if programme.player_key_expiry_days %}
+                    {% with expiry_date=programme.default_expiry_date_from_today %}
+                        <p>Candidates in this programme have a default of <strong>{{ programme.player_key_expiry_days }}</strong>
+                            days to complete the games-based assessments after receiving their instructions. <br>
+                            From today's date that is {{ expiry_date }} {{ expiry_date.tzinfo }}
+                        </p>
+                    {% endwith %}
+                {% else %}
+                    <p>There is no default assessment deadline applied to candidates in this programme.</p>
+                {% endif %}
+            </div>
+        </div>
+
+    {% endif %}
+    </div>
+</div>
+
+{# START: Game-based assessments #}
+<hr>
+<div class="row">
+    <div class="col-xs-12">
+        <h4>Game-Based Assessments:</h4>
+        {% if games_and_levels %}
+            <table>
+                <tbody>
+                    {% for game in games_and_levels %}
+                        <tr>
+                            <td>{{ game }}:&nbsp;</td>
+                            <td>
+                                {% for level in game.game_levels %}
+                                    <span class="label label-default">{{ level.name }}</span>
+                                {% empty %}
+                                    <span class="label label-default">All levels</span>
+                                {% endfor %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            Game-based assessments have not yet been defined for this programme.
+        {% endif %}
+    </div>
+</div>
+{# END: Game-based assessments #}
+
+{# START: Norm groups #}
+<hr>
+<div class="row">
+    <div class="col-xs-12">
+        <h4 class="programme-detail-subtitle">
+            Norm Groups:
+            {% if user.is_staff %}
+                <a class="link" href="{% url 'programme:normgroup-update' programme.pk %}">
+                    <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
+                    Edit
+                </a>
+            {% endif %}
+        </h4>
+    </div>
+    {% if user.is_staff %}
+        <div class="col-xs-12">
+            <p><span class="label label-info">Insights and editing are available to Arctic Shores staff only</span>
+            </p>
+        </div>
+    {% endif %}
+    <div class="col-xs-12">
+        {% if norm_groups %}
+            <table>
+                <tbody>
+                {% for norm_group in norm_groups %}
+                    <tr>
+                        <td valign="top">
+                            {{ norm_group.game }}:&nbsp;
+                            {% if user.is_staff %}
+                                <br>
+                                <a class="link" href="{% url 'programme:normgroup-insight' programme.pk norm_group.pk %}">
+                                    <span class="glyphicon glyphicon-info-sign" aria-hidden="true"></span>
+                                    Insights
+                                </a>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {{ norm_group.name }}
+                            {% if norm_group.public_description %}
+                                <br>
+                                <small><em>{{ norm_group.public_description }}</em></small>
+                            {% endif %}
+                            <br>
+                            {% if norm_group.has_item_banks %}
+                                <span class="label label-default">{{ norm_group.abstract_item_bank.name }}</span>
+                                <span class="label label-default">{{ norm_group.numeric_item_bank.name }}</span>
+                                <span class="label label-default">{{ norm_group.verbal_item_bank.name }}</span>
+                            {% else %}
+                                <span class="label label-default">Scoring Key v{{ norm_group.scoring_key_version }}</span>
+                            {% endif %}
+                            <br>&nbsp;
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            Norm groups have not yet been defined for this programme.
+        {% endif %}
+    </div>
+</div>
+{# END: Norm groups #}
+
+{# START: Reports #}
+<hr>
+<div class="row">
+    <div class="col-xs-8">
+        <h4>Reports:</h4>
+        {% if manager_reports or manager_materials %}
+            <h5><strong>For Managers</strong></h5>
+            <div class="panel">
+                {% for report in manager_reports %}
+                    <li class="list-group-item">{{ report.name }}</li>
+                {% empty %}
+                    <li class="list-group-item">Default Manager/Fit Report</li>
+                {% endfor %}
+                {% for material in manager_materials %}
+                    <li class="list-group-item"><a href="{{ material.file.url }}">{{ material.name }}</a>
+                {% endfor %}
+            </div>
+        {% endif %}
+        {% if candidate_reports %}
+            <h5><strong>For Candidates</strong></h5>
+            <div class="panel">
+                {% for report in candidate_reports %}
+                    <li class="list-group-item">{{ report.game.base_name }}: {{ report.name }}</li>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        Auto-email Candidate Reports:
+        {% if user_can_edit %}
+            <input type="checkbox" id="autoemail-report-checkbox" {% if programme.autoemail_report %}checked="checked"{% endif %}>
+        {% else %}
+            {% if programme.autoemail_report %}
+                <span class="glyphicon glyphicon-ok"></span>
+            {% else %}
+                <span class="glyphicon glyphicon-remove"></span>
+            {% endif %}
+        {% endif %}
+    </div>
+</div>
+{# END: Reports #}
+
+{# START: Fit Profiles #}
+<hr>
+<div class="row">
+    <div class="col-xs-12">
+        <h4 class="programme-detail-subtitle">
+            Fit Profiles
+            {% if user.is_staff %}
+                {% if personality_game_attached %}
+                    <a class="link" href="{% url 'competency:role-create' programme_id=programme.id %}">
+                        <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
+                        Add
+                    </a>
+                {% else %}
+                    {# TODO: This message is only helpful if the user knows which games are personality type #}
+                    <small>
+                        (To enable fit profiles a personality game-based assessment must be included in this programme)
+                    </small>
+                {% endif %}
+            {% endif %}
+        </h4>
+    </div>
+
+    {% if user.is_staff %}
+        <div class="col-xs-12">
+            <span class="label label-info">Editable by Arctic Shores staff only</span>
+            <br><br>
+        </div>
+    {% endif %}
+
+    <div class="col-xs-12 col-md-8">
+        {% for profile_group, profiles_info in programme.grouped_profiles %}
+            <h5>
+                <strong>{{ profile_group|title }} Profiles </strong>
+                {% if user.is_staff and profile_group == 'aptitude sift' %}
+                    {% if not aptitude_game_attached %}
+                        {# TODO: This message is only helpful if the user knows which games are aptitude type #}
+                        <small>(To enable aptitude sift profiles an aptitude assessment must be included in this programme)</small>
+                    {% elif programme.has_aptitude_fit_profiles %}
+                        <small>(A sift profile cannot be added when the fit profile contains aptitude traits)</small>
+                    {% elif profiles_info|length >= 1 %}
+                        <small>(There is a limit of one sift profile per programme)</small>
+                    {% else %}
+                        <a class="link" href="{% url 'competency:role-create' programme_id=programme.id %}?sifting=true">
+                            <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
+                            Add
+                        </a>
+                    {% endif %}
+                {% endif %}
+            </h5>
+            <ul class="list-group">
+                {% for profile, traits in profiles_info %}
+                    {% if user.is_staff %}
+                        <a href="{% url 'competency:role-edit' role_id=profile.id %}{% if profile_group == 'aptitude sift' %}?sifting=true{% endif %}" class="list-group-item">
+                    {% else %}
+                        <li class="list-group-item">
+                    {% endif %}
+                        <div style="display: flex;">
+                            <div style="flex: 1">
+                                <span class="label label-default">{{ profile.name }}</span>
+                            </div>
+                            <div style="flex: 2" >
+                                <small>{{ traits|join:", "}}</small>
+                            </div>
+                        </div>
+                    {% if user.is_staff %}
+                        </a>
+                    {% else %}
+                        </li>
+                    {% endif %}
+                {% empty %}
+                    <li class="list-group-item"><span class="label label-default">{{ None }}</span></li>
+                {% endfor %}
+            </ul>
+        {% empty %}
+            There are no fit profiles.
+        {% endfor %}
+    </div>
+</div>
+{# END: Fit Profiles #}
+
+{# START: SOC group  #}
+{% if programme.soc_job_group or user.is_staff %}
+<div class="row">
+    <div class="col-xs-8">
+        <hr>
+        <h4 class="programme-detail-subtitle">
+            SOC Job group
+            {% if user.is_staff %}
+            <a href="{% url 'career:socjobgroup-manage' %}" target="_blank" class="link">
+                <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
+                Manage groups
+            </a>
+            {% endif %}
+        </h4>
+        {% if user.is_staff %}
+        <span class="label label-info">Editable by Arctic Shores staff only</span>
+            <br><br>
+        {% endif %}
+        <ul class="list-group">
+            {% if programme.soc_job_group %}
+            <li class="list-group-item">
+                <div class="panel">
+                    <div class="panel-title">
+                        {{ programme.soc_job_group.name }} &nbsp
+                        <a id="showSOCJobGroupCollapseLink" href="#SOCJobGroupCollapse" data-toggle="collapse">
+                            <span class="glyphicon glyphicon-eye-open"></span>&nbsp View jobs</a>
+                    </div>
+                    <div class="collapse" id="SOCJobGroupCollapse">
+                        <table class="table table-condensed" >
+                            <thead>
+                                <tr>
+                                    <th>SOC code</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            {% for job in programme.soc_job_group.jobs.all %}
+                                <tr>
+                                    <td>{{ job.soc_code }}</td>
+                                    <td>{{ job.soc_description }}</td>
+                                </tr>
+                            {% endfor %}
+                        </table>
+                    </div>
+                </div>
+            </li>
+            {% else %}
+            <li class="list-group-item"><span class="label label-default">{{ None }}</span></li>
+            {% endif %}
+        </ul>
+    </div>
+</div>
+{% endif %}
+{# END: SOC group  #}
+
+{# START: Emails #}
+<hr>
+<div class="row">
+    <div class="col-xs-8">
+        <h4>Emails:</h4>
+        <div class="list-group">
+            <a href="{% url 'programme:email-list' programme.pk %}" class="list-group-item">All emails</a>
+            {% for email in email_list %}
+            <a href="{% url 'programme:email-list' programme.pk %}#{{ email.slug }}" class="list-group-item">
+                <span class="badge">
+                {% if email.custom %}
+                    <em><small>This email has been customised</small></em> <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+                {% else %}
+                    <em><small>This email has not been customised</small></em> <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                {% endif %}
+                </span>
+                {{ email.get_email_type_display }}
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="col-xs-4"></div>
+</div>
+{# END: Emails #}
+
+{# START: Surveys #}
+<hr>
+<div class="row">
+    <div class="col-xs-12">
+        <h4>Surveys:</h4>
+        End of game link:
+            {% if 'http' in end_of_game_link %}
+                <a href="{{ end_of_game_link }}">{{ end_of_game_link }}</a>
+            {% else %}
+                <span class="label label-default">{{ end_of_game_link }}</span>
+            {% endif %}
+        {% if programme.ats %}
+            <p><strong>Note: This programme is associated with an ATS which may customise the end of survey link for each player</strong></p>
+        {% endif %}
+    </div>
+    {% if surveys_presented %}
+        <div class="col-xs-12">
+            Surveys presented: {% for survey in surveys_presented %}<span class="label label-default">{{ survey }}</span> {% endfor %}
+        </div>
+    {% endif %}
+    {% if end_of_survey_link %}
+        <div class="col-xs-12">
+            End of survey link: <span class="{% if 'http' in end_of_survey_link %}link{% else %}label label-default{% endif %}">{{ end_of_survey_link }}</span>
+        </div>
+    {% endif %}
+</div>
+{# END: Surveys #}
+
+{# START: ATS #}
+{% if user.is_staff %}
+<hr>
+<div class="row">
+    <div class="col-xs-12">
+        <h4 class="programme-detail-subtitle">
+            Applicant Tracking System (ATS):
+            <a class="link" href="{% url 'programme:ats-update' programme.pk %}">
+                <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
+                Edit
+            </a>
+        </h4>
+        {% if programme.ats %}
+            Provider: {{ programme.ats.company_name }}
+            <br>
+            {% with ats_key=programme.ats_api_key %}
+                {% if ats_key %}
+                    Programme Key / API Key: {{ ats_key }}
+                {% else %}
+                    This ATS has not been configured - please contact support.
+                {% endif %}
+            {% endwith %}
+            <br><br>
+            {% if programme.auto_push_ats %}
+                <small>Player results in this programme are automatically pushed to the above Applicant Tracking System.
+                </small>
+            {% else %}
+                <strong>Auto push ATS is disabled. Player results for this programme will not be automatically pushed
+                    to the above ATS.</strong>
+            {% endif %}
+        {% else %}
+            An ATS has not been configured for this programme.
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+{# END: ATS #}
+
+{# START: Self Registration #}
+<hr>
+<div class="row">
+    <div class="col-xs-12">
+        <h4>Self-Registration</h4>
+        <span class="label label-default">{{ programme.self_registration_scheme }}</span>
+        {% if programme.self_registration_scheme.registration_url %}
+            &nbsp; <a href="{{ programme.self_registration_scheme.registration_url }}">Registration Page</a>
+        {% endif %}<br>
+        {% if programme.self_registration_scheme %}
+            Status: <span class="label label-{{ programme.self_registration_scheme.status.0 }}">
+        {{ programme.self_registration_scheme.status.1 }}</span>
+        {% endif %}
+    </div>
+</div>
+<div class="row">
+    <div class="col-xs-12">
+        {% if programme.self_registration_scheme.expiry_date %}
+            Registration Expiry Date: {{ programme.self_registration_scheme.expiry_date }}<br>
+        {% endif %}
+        {% if programme.self_registration_scheme.player_count_limit %}
+            Completed Player Limit: {{ programme.self_registration_scheme.completed_player_count_limit }}<br>
+        {% endif %}
+    </div>
+</div>
+{# END: Self Registration #}
+
+{# START: Results #}
+<hr>
+<div class="row">
+    <div class="col-xs-12">
+        <h4>Results:</h4>
+        {% if players_with_scores_count %}
+            An overview of results for <strong>{{ players_with_scores_count }}</strong>
+            candidate{{ players_with_scores_count|pluralize:" is,s are" }} available.
+            <a href="{% url 'programme:results' programme.id %}">Visualise Results &gt;&gt;</a>
+        {% else %}
+            There are no results for this programme yet.
+        {% endif %}
+    </div>
+</div>
+{# END: Results #}
+
+{% include 'programme/modals/confirm_programme_delete.html' %}
+{% include 'programme/modals/confirm_programme_inactive.html' %}
+{% include 'programme/modals/confirm_programme_clone.html' %}
+{% endblock content %}
+
+{% block javascript %}
+    {{ block.super }}
+
+    <script type="text/javascript">
+        // Initialise programme status switch
+        $("input[name='programme-status-checkbox']").bootstrapSwitch();
+
+        $(document).ready(function() {
+            /* Auto email report toggle checkbox */
+            $("#autoemail-report-checkbox").click(function(event) {
+                var state = $(this).prop("checked");
+                var url = "{% url 'portal-api:programme-update' programme.pk %}"
+                toggleAutoEmailReport(state, url);
+                message = {
+                    true: "enabled",
+                    false: "disabled"
+                }
+                noty({
+                    text: "Auto-email report " + message[state]
+                });
+            });
+
+            /* Confirm delete programme modal */
+            $("[id^=deleteProgramme-]").click(function(event) {
+                event.preventDefault();
+                var href = $(this).attr('href');
+                var modalText = "Are you sure you want to delete <strong>{{ programme.name }}</strong>?";
+                // NOTE: selected div included at the end of the content block
+                showModal('#confirmProgrammeDeleteModal', modalText, function(event) {
+                    var deleteProgrammeForm = $('#programmeDeleteForm');
+                    deleteProgrammeForm.attr('action', href);
+                });
+            });
+
+            $("[id^=cloneProgramme]").click(function(event) {
+                event.preventDefault();
+                var href = $(this).attr('href');
+                // NOTE: selected div included at the end of the content block
+                showModal('#confirmProgrammeCloneModal', undefined, function(event) {
+                    var cloneProgrammeForm = $('#programmeCloneForm');
+                    cloneProgrammeForm.attr('action', href);
+                });
+            });
+
+            // Programme active/inactive toggle button
+            $("input[name='programme-status-checkbox']").on('switchChange.bootstrapSwitch', function(event, state) {
+                var $programmeStatusToggle = $(this);
+                var url = "{% url 'portal-api:programme-update' programme.pk %}";
+                if (!state) {
+                    // Only show a modal if the programme is being disabled
+                    showModal('#confirmProgrammeInactiveModal', undefined,
+                        // success function
+                        function(event) {
+                            toggleProgrammeActive(
+                                "false",
+                                url,
+                                function() {
+                                    // refresh the page to display warnings
+                                    window.location.reload();
+                                }
+                            ); // set active to false
+                        },
+                        // decline function
+                        function(event) {
+                            // second parameter skip will prevent switchChange event being executed if true
+                            $programmeStatusToggle.bootstrapSwitch('toggleState', true);
+                        }
+                    );
+                }
+                else {
+                    toggleProgrammeActive(
+                        "true", url,
+                        function() {
+                            // refresh the page to display warnings
+                            window.location.reload();
+                            noty({text: "Programme enabled"}); // display confirmation to user
+                        }
+                    ); // set active to true
+                }
+            });
+            /* SOC Job group hide/show icon and text toggle */
+            $('#SOCJobGroupCollapse').on('show.bs.collapse', function(){
+                var span = $('#showSOCJobGroupCollapseLink').find("span")
+                span.toggleClass("glyphicon-eye-open");
+                span.toggleClass("glyphicon-eye-close");
+                $('#showSOCJobGroupCollapseLink').html("&nbsp Hide jobs");
+                $('#showSOCJobGroupCollapseLink').prepend(span);
+
+            });
+            $('#SOCJobGroupCollapse').on('hide.bs.collapse', function(){
+                var span = $('#showSOCJobGroupCollapseLink').find("span")
+                span.toggleClass("glyphicon-eye-open");
+                span.toggleClass("glyphicon-eye-close");
+                $('#showSOCJobGroupCollapseLink').html("&nbsp View jobs");
+                $('#showSOCJobGroupCollapseLink').prepend(span);
+            })
+        });
+    </script>
+{% endblock javascript %}

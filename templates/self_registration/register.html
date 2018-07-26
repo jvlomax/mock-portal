@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% load staticfiles i18n crispy_forms_tags %}
+{% block title %} {% trans "Register" %} {% endblock %}
+{% block nav %}
+<nav class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+            <a class="navbar-brand">
+                <img alt="Arctic Shores" src="{% static 'images/arctic-shores-logo.png' %}" width="172">
+            </a>
+        </div>
+    </div>
+</nav>
+{% endblock nav %}
+
+{% block content %}
+    {% if self_registration_scheme.image %}
+        <img style="float:right; position: relative" src="{{ self_registration_scheme.image.url }}">
+    {% endif %}
+
+    <h2>{% trans "Register or Retrieve your Username/Player Key" %}</h2>
+    <img style="margin:25px 0px; max-width: 100%" src="{{ self_registration_scheme.programme_set.first.games.first.screenshot.url }}">
+    <p>{{ self_registration_scheme.intro_text|safe }}</p>
+
+    <br>
+    {% crispy form %}
+    <br>
+    {% if self_registration_scheme.self_download_report %}
+        <h5>{% trans "Looking for the results of your assessment?" %} <a href="{% url 'reporting:report-login' self_registration_scheme.key %}">{% trans "Click here" %}</a>.</h5>
+    {% endif %}
+    <h5>
+    {% blocktrans with support_email=self_registration_scheme.support_email_address %}For support, please email <a href="{{ support_email }}">{{ support_email }}</a>.{% endblocktrans %}
+    </h5>
+
+    <h4>
+        <small>
+    {% blocktrans %}* Your data will be stored internally in a secure database and under no circumstances will be made available to third parties.{% endblocktrans %}
+        </small>
+    </h4>
+
+{% endblock %}

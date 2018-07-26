@@ -1,0 +1,15 @@
+{% extends "competency/modals/extend/confirm_delete.html" %}
+
+{% comment %}
+    Takes in:
+        - csrf_token
+        - competency_id
+{% endcomment %}
+
+{% block title %}Are you sure you want to delete this Competency?{% endblock %}
+
+{% block body %}
+    Deletes cannot be undone.
+{% endblock %}
+
+{% block url %}{% url 'competency:competency-delete' competency_id=competency_id %}{% endblock %}

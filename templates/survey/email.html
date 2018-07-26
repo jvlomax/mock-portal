@@ -1,0 +1,17 @@
+{% extends "base-mobile.html" %}
+{% block content %}
+    <form method="POST">
+      {% csrf_token %}
+      <div class="heading">
+        Please enter your email address to proceed with the survey.
+      </div>
+      {% with field=form.email %}
+          <div id="{{ field.auto_id }}_container" class="field_container">
+            <div id="{{ field.auto_id }}_errors">{{ field.errors }}</div>
+            <div>{{ field.label_tag }}</div><div>{{ field }}</div>
+          </div>
+      {% endwith %}
+
+      <input id="continue" type="submit" value="Continue" />
+    </form>
+{% endblock content %}

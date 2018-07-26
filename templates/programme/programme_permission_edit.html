@@ -1,0 +1,20 @@
+{% extends "programme/base.html" %}
+{% load staticfiles i18n crispy_forms_tags %}
+
+{% block title %}{% trans "Programme" %} {{ programme.name }} | Permissions {% endblock title %}
+
+{% block nav %}{% with section="programmes" %}{{ block.super }}{% endwith %}{% endblock nav %}
+
+{% block breadcrumbs %}
+    {{ block.super }} &raquo;
+    <a href="{% url 'programme:detail' programme.id %}">{{ programme.name }}</a> &raquo;
+    <a href="{% url 'programme:permissions-list' programme.id %}">Permissions</a> &raquo;
+    {{ target_user.front_end_label }}
+{% endblock breadcrumbs %}
+
+{% block content %}
+    <h2>User Permissions - {{ programme.name }}</h2>
+    <h3>{{ target_user.front_end_label }}</h3>
+    <p>Use the checkboxes below to grant or revoke permissions.</p>
+    {% crispy form %}
+{% endblock %}

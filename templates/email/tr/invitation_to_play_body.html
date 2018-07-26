@@ -1,0 +1,65 @@
+{# This is separate as it is a **subset of the full translation** of the template #}
+
+{% load humanize %}
+{% load i18n %}
+
+<p>
+    Merhaba {% verbatim %}{{ first_name }}{% endverbatim %},
+</p>
+<p>
+    Bu e-posta daveti size {{ company }} tarafından gönderilmiştir.
+    Sizi mobil cihazınız aracılığıyla tamamlayacağınız oyun-temelli online psikometrik ölçme -
+    değerlendirme uygulamasına davet etmekten mutluluk duyuyoruz.
+</p>
+<p>
+    <b>Oyun-temelli psikometrik ölçme - değerlendirme uygulaması nedir?</b>
+<p>
+    Bu değerlendirme yöntemini, kişilik özelliklerinizin kurumla uyumunu adil ve objektif olarak sunduğu için kullanıyoruz. Değerlendirme kapsamında kullanılan oyunların tamamı kolay anlaşılır ve oynanabilir niteliktedir. Daha önceden edinilen ölçme – değerlendirme deneyimi veya herhangi bir oyun tecrübesi gerekli değildir ve daha önceki tecrübelerinizin sonuçlarınıza herhangi bir etkisi olmayacaktır.
+</p>
+<p>
+    Bu değerlendirmede doğru veya yanlış bir yol ya da yöntem yoktur. Yalnızca oyun ekranlarında yer verilen yönergeleri dikkatli bir şekilde okuyunuz ve oyundaki senaryolara içinizden geldiği gibi yanıtlar veriniz. Herhangi bir zaman kısıtlaması olmamakla birlikte, oyun yaklaşık olarak 20 – 30 dakikada tamamlanabilir. Ancak her bireyin farklı olduğunu aklınızda tutunuz ve oyunu kendi hızınızda tamamlayınız.
+</p>
+
+<p>
+    <b>Lütfen dikkatli bir şekilde aşağıdaki yönergeleri okuyunuz.</b>
+    <br>
+    1. Download - Oyunu İndirime.
+       Aşağıdaki linke tıklayarak uygulamayı akıllı telefonunuza veya tabletinize indiriniz.
+       Uygulama dört yıl önceye kadar lanse edilmiş olan Android ve IOS cihazları tarafından desteklenmektedir.
+       Eğer uygulama için uygun bir cihaza sahip değilseniz lütfen emulator kullanmayınız.
+       Bunun yerine uygulamayı indirmek için uygun cihaza sahip olan bir arkadaşınızdan veya aile üyelerinizden
+       onların cihazlarını kullanma konusunda destek rica edebilirsiniz.
+    <br>
+    2. Uygun Ortam.
+       Diğer pek çok değerlendirme uygulamalarında olduğu gibi bölünmeyeceğiniz ve rahatsız
+       edilmeyeceğiniz sakin bir ortamda oyunu / değerlendirmeyi tamamlayınız. Lütfen cihazınızda;
+
+        a) İnternet bağlantısının güçlü, bataryasının dolu
+        b) “Rahatsız Etme” ayarının aktif
+        c) Tüm bildirimlerin devre dışı bırakıldığından emin olunuz.
+    <br>
+    3. Giriş.
+       Lütfen oyunu başlatmak için size özel oluşturulmuş olan aşağıdaki şifreyai giriniz.
+    <br>
+</p>
+<p>
+    <code style="padding: 0.5em; font-size: 1em; color: black;"><b>{% verbatim %}{{ player_key }}{% endverbatim %}</b></code>
+</p>
+
+{% for game in games %}
+    <b>{{ game.name }} ({% trans game.get_game_type_display %})</b>
+    <p>
+        iOS: <a href="{{ game.ios_url }}">{{ game.ios_url }}</a>
+        <br>
+        Android: <a href="{{ game.android_url }}">{{ game.android_url }}</a>
+    </p>
+{% endfor %}
+
+<p>
+    Herhangi bir sorunla karşılaşırsanız lütfen <a href="mailto:support@arcticshores.com">support@arcticshores.com</a>
+    adresine e-mail gönderebilirsiniz.
+    Lütfen e-mailinizde cihazınızın modelini, başvuru yaptığınız şirketin ve oynadığınız oyunun adını bize iletiniz.
+</p>
+
+<p>Bol Şanslar!</p>
+<h3><em><strong>The Arctic Shores Team</strong></em></h3>

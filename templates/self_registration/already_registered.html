@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% comment %}
+    Uses request.GET['email']
+{% endcomment %}
+
+{% load staticfiles i18n %}
+{% block title %} {% trans "You have already registered" %} {% endblock %}
+{% block nav %}
+    <nav class="navbar navbar-default navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <a class="navbar-brand">
+                    <img alt="Arctic Shores" src="{% static 'images/arctic-shores-logo.png' %}" width="172">
+                </a>
+            </div>
+        </div>
+    </nav>
+{% endblock nav %}
+
+{% block content %}
+    <h3>{% trans "You have already registered" %}</h3>
+    <p>
+        {% if request.GET.email %}
+            <p>{% blocktrans with candidate_email=request.GET.email %}We have sent the details of your assessment to <em>{{ candidate_email }}</em> again and you should receive the email shortly. Please remember to check your spam folder.{% endblocktrans %}</p>
+            <p></p>
+        {% else %}
+            <p>{% trans "The details of your assessment were given when you registered." %}</p>
+        {% endif %}
+
+        <p>
+            {% blocktrans with support_email=selfregistrationscheme.support_email_address %}Please contact <a href="mailto:{{ support_email }}">{{ support_email }}</a> for further assistance.{% endblocktrans %}
+        </p>
+    </p>
+{% endblock %}

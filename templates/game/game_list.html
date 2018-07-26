@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% load i18n staticfiles jinjas_must_die %}
+
+{% block title %}{% trans "Game-Based Assessments" %}{% endblock title %}
+
+{% block nav %}{% with section="assessments" %}{{ block.super }}{% endwith %}{% endblock nav %}
+
+{% block content %}
+<div class="row">
+    <div class="col-xs-12">
+        <h2>{{ company.name }}</h2>
+        <hr>
+    </div>
+</div>
+<div class="game-list">
+    {% for game in object_list %}
+    <div class="game-list-game">
+        {% if game.logo %} <img class="game-logo" src="{{ game.logo.url }}"> {% endif %}
+        <h3 class="game-title"><a href="{% url 'game:detail' game.slug %}">{{ game.name }}</a></h3>
+        <p class="game-description">{{ game.description }}</p>
+        <div class="game-list-downloads">
+            {% if game.android_url %}
+            <a href="{{ game.android_url }}">
+                <img alt="Get it on Google Play" class="google-play-button"
+                    src="{% static 'images/en-play-badge.png' %}" height="45">
+            </a>
+            {% endif %}
+            {% if game.ios_url %}
+            <a href="{{ game.ios_url }}">
+                <img alt="Download on the App Store" class="app-store-button"
+                    src="{% static 'images/appstore.svg' %}" height="45">
+            </a>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock content%}

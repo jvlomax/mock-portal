@@ -1,0 +1,165 @@
+/**
+ * Buttons
+ */
+
+.btn {
+    color: #fff;
+    text-transform: uppercase;
+    border-radius: 30px;
+    padding: 15px 60px 15px 30px;
+    background: $grey-100;
+    position: relative;
+    &:after {
+        content: '>';
+        position: absolute;
+        right: 20px;
+        color: $green;
+        font-weight: bold;
+    }
+    &:hover,
+    &:focus {
+        color: #fff;
+        background: $grey-100;
+    }
+}
+
+.btn-white {
+    @extend .btn;
+    background: #fff;
+    color: $green;
+    border: 3px solid $green;
+    &:hover,
+    &:focus {
+        color: $green;
+        background: #fff;
+    }
+}
+
+.btn-danger {
+    background: $red;
+    &:after {
+        color: #fff;
+    }
+    &:hover,
+    &:focus {
+        background: $red;
+    }
+}
+
+.btn-search {
+    border: 0;
+    border-radius: 3px;
+    background: $black;
+    display: inline-block;
+    height: 35px;
+    width: 32px;
+    &:hover {
+        border: 1px solid #fff;
+    }
+    & :before {
+        color: #fff;
+    }
+    .glyphicon {
+        top: 3px;
+        left: 1px;
+    }
+    .title {
+        text-indent: -9999px;
+        display: inline-block;
+    }
+}
+
+.btn-icon-large {
+    padding: 50px 20px 14px;
+    border: 2px solid $grey-10;
+    border-radius: 50%;
+    text-align: center;
+    background: $green;
+    color: #fff;
+    transition: all 0.2s ease-out;
+    width: 175px;
+    height: 175px;
+    margin: 0 17px;
+    float: left;
+    & :before {
+        font-size: 42px;
+    }
+    &:hover,
+    &:focus {
+        background: $green;
+        color: #fff;
+        transform: scale(1.05);
+    }
+}
+
+.btn-icon-large-counter {
+    padding-top: 30px;
+}
+
+/* Button Dropdown */
+.btn-group,
+.dropdown {
+    .btn {
+        border-radius: 3px;
+        padding: 10px 25px 10px 30px;
+        &:after {
+            display: none;
+        }
+        &:hover {
+            border: 1px solid #fff;
+        }
+    }
+}
+
+.btn-group {
+    .dropdown-toggle {
+        border-left: 1px solid #fff;
+    }
+}
+
+.container {
+    .btn-group .dropdown-toggle,
+    .btn-group .dropdown-toggle:active {
+        box-shadow: none;
+    }
+}
+
+/* Standard Links */
+a,
+.link {
+    color: $green;
+    border-bottom: 1px dotted $green;
+    &:hover {
+        color: $green;
+        text-decoration: none;
+    }
+}
+
+.link-danger {
+    @extend .link;
+    color: $red;
+    border-bottom: 1px dotted $red;
+    &:hover {
+        border-bottom: 1px dotted $green;
+    }
+}
+
+/* Disable Buttons */
+.btn-primary.disabled,
+.btn-primary[disabled],
+fieldset[disabled] .btn-primary,
+.btn-primary.disabled:hover,
+.btn-primary[disabled]:hover,
+fieldset[disabled] .btn-primary:hover,
+.btn-primary.disabled:focus,
+.btn-primary[disabled]:focus,
+fieldset[disabled] .btn-primary:focus,
+.btn-primary.disabled:active,
+.btn-primary[disabled]:active,
+fieldset[disabled] .btn-primary:active,
+.btn-primary.disabled.active,
+.btn-primary[disabled].active,
+fieldset[disabled] .btn-primary.active {
+    background: $grey;
+    border: 0;
+}

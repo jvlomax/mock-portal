@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Companies{% endblock %}
+
+{% block nav %}{% with section="companies" %}{{ block.super }}{% endwith %}{% endblock nav %}
+
+{% block breadcrumbs %}
+    Manage Companies &raquo; Resellers
+{% endblock %}
+
+{% block content %}
+    {% with is_staff=user.is_staff is_reseller=user.is_reseller reseller_count=user.resellers.count %}
+        <div class="container">
+            <div class="row">
+                <h3 class="col-sm-4">Manage Companies</h3>
+                {% if is_staff %}
+                    <a class="btn col-sm-2 pull-right" href="{% url 'company:reseller-create' %}">Create Reseller</a>
+                {% endif %}
+            </div>
+
+            <div class="row">
+                <p class="col-sm-12">
+                    {% if is_staff %}Select a Reseller to edit, or {% endif %}"View Companies" to see all the Companies for that Reseller.
+                </p>
+            </div>
+            <br>
+            <div class="row">
+                <table class="table table-condensed">
+                    <tr>
+                        <th class="col-lg-3">Reseller Name</th><th class="col-lg-3"></th>
+                    </tr>
+                    {% for reseller_id, reseller_name, support_email_address in object_list %}
+                        <tr>
+                            <td>
+                                {{ reseller_name }}
+                                {% if is_staff %}
+                                    <a href="{% url 'company:reseller-update' reseller_id %}">
+                                        <span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit
+                                    </a>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{% url 'company:select' %}?reseller_id={{ reseller_id }}">
+                                    View/Add Companies
+                                </a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            </div>
+            {% if is_staff %}
+                <div class="row">
+                    <a class="btn col-sm-2 pull-right" href="{% url 'company:reseller-create' %}">Create Reseller</a>
+                </div>
+            {% endif %}
+        </div>
+    {% endwith %}
+{% endblock %}

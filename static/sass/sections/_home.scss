@@ -1,0 +1,23 @@
+/**
+ * Home
+ */
+
+.home-icon {
+    text-align: center;
+    border-left: 1px solid $grey-10;
+    transition: all 0.2s ease-out;
+    &:hover {
+        transform: scale(1.03);
+    }
+    .img-responsive {
+        margin: 20px auto 0;
+    }
+    .text {
+        margin: 20px auto 0;
+        max-width: 250px;
+    }
+}
+
+.home-icon-01 {
+    border: none;
+}

@@ -1,0 +1,16 @@
+a.star {
+  border-bottom: none;
+
+  .glyphicon-star {
+    color: lightgrey;
+    &:hover {
+      color: darken(lightgrey, 10%);
+    }
+  }
+  .starred {
+    color: orange;
+    &:hover {
+      color: lighten(orange, 15%);
+    }
+  }
+}

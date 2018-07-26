@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{{ game.name }}{% endblock title %}
+
+{% block nav %}{% with section="games" %}{{ block.super }}{% endwith %}{% endblock nav %}
+
+{% block content %}
+<h1>{{ game.name }} </h1>
+
+
+    <img class="game-screenshot" src="{{ game.screenshot.url }}">
+    <br><br>
+
+    <ul>
+        <li><b>Description:</b> {{ game.description }}</li>
+        <li><b>iOS URL:</b> <a id="ios_url" href="{{ game.ios_url }}">{{ game.ios_url }}</a></li>
+        <li><b>Android URL: </b><a id="android_url" href="{{ game.android_url }}">{{ game.android_url }}</a></li>
+        <li><b>Scoring Key Version: </b>{{ game.default_scoring_key_version }}</li>
+    </ul>
+<a id='back-game-list' href="{% url 'game:game-list' %}" class="btn btn-info">Back to all assessments</a>
+{% endblock content %}

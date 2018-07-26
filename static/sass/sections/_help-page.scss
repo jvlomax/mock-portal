@@ -1,0 +1,15 @@
+/**
+ * Help Page
+ */
+
+.help-page {
+    .nav {
+        margin-bottom: 20px;
+        a {
+            text-align: center;
+        }
+        & :before {
+            font-size: 30px;
+        }
+    }
+}

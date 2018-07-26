@@ -1,0 +1,57 @@
+{# extend the default django_tables2 table template to provide customised pagination #}
+{% extends "django_tables2/table.html" %}
+
+{% load django_tables2 %}
+
+{# Provide additional pagination at the top of the page inside the table block #}
+{% block table %}
+    <div class="row">
+        {% if player_table.page %}
+            {% with player_table.page.paginator.count as total %}
+            {% with player_table.page.object_list|length as count %}
+                <div class="col-sm-2">
+                    {% if player_table.page.has_previous %}
+                        <a href="{% querystring player_table.prefixed_page_field=player_table.page.previous_page_number %}">&laquo;</a>
+                    {% endif %}
+                    {% if player_table.page.has_previous or player_table.page.has_next %}
+                        {% with player_table.page.number as current and player_table.paginator.num_pages as total %} Page <strong>{{ current }}</strong> of {{ total }}{% endwith %}
+                    {% endif %}
+                    {% if player_table.page.has_next %}
+                        <a href="{% querystring player_table.prefixed_page_field=player_table.page.next_page_number %}">&raquo;</a>
+                    {% endif %}
+                    <br>
+                    {% if total != count %}{{ count }} of {{ total }}{% else %}{{ total }}{% endif %}
+                    candidate{{ count|pluralize }}
+                </div>
+            {% endwith %}
+            {% endwith %}
+        {% endif %}
+    </div><br>
+    {{ block.super }}
+{% endblock %}
+
+{# Override the default pagination at the bottom of the page with slightly different formatting #}
+{% block pagination %}
+    <div class="row">
+        {% if player_table.page %}
+            {% with player_table.page.paginator.count as total %}
+            {% with player_table.page.object_list|length as count %}
+                <div class="col-sm-2">
+                    {% if player_table.page.has_previous %}
+                        <a href="{% querystring player_table.prefixed_page_field=player_table.page.previous_page_number %}">&laquo;</a>
+                    {% endif %}
+                    {% if player_table.page.has_previous or player_table.page.has_next %}
+                        {% with player_table.page.number as current and player_table.paginator.num_pages as total %} Page <strong>{{ current }}</strong> of {{ total }}{% endwith %}
+                    {% endif %}
+                    {% if player_table.page.has_next %}
+                        <a href="{% querystring player_table.prefixed_page_field=player_table.page.next_page_number %}">&raquo;</a>
+                    {% endif %}
+                    <br>
+                    {% if total != count %}{{ count }} of {{ total }}{% else %}{{ total }}{% endif %}
+                    {% if total == 1 %}{{ player_table.data.verbose_name }}{% else %}{{ player_table.data.verbose_name_plural }}{% endif %}
+                </div>
+            {% endwith %}
+            {% endwith %}
+        {% endif %}
+    </div>
+{% endblock %}

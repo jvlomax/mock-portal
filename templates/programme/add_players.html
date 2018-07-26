@@ -1,0 +1,96 @@
+{% extends "programme/base.html" %}
+{% load i18n crispy_forms_tags %}
+
+{% block title %}{% trans "Add candidates" %}{% endblock title %}
+
+{% block nav %}{% with section="programmes" %}{{ block.super }}{% endwith %}{% endblock nav %}
+
+{% block breadcrumbs %}
+    {{ block.super }}
+    &raquo; <a href="{% url 'programme:detail' programme.id %}">{{ programme.name }}</a>
+    &raquo; Add candidates
+{% endblock breadcrumbs %}
+
+{% block programme %}
+    {{ block.super }}
+    <h3>Upload candidates via CSV file</h3>
+    <br>
+{% endblock programme %}
+
+{% block content %}
+    <h4>Required fields</h4>
+    <ul>
+        <li><code>email</code>: to uniquely identify a candidate in this programme and to email invitations and reports.</li>
+        <em>or</em>
+        <li><code>client_supplied_id</code>: externally supplied ID to uniquely identify a candidate.</li>
+    </ul>
+    <br>
+
+    <h4>Optional fields</h4>
+    <ul>
+        <li><code>first_name</code></li>
+        <li><code>last_name</code></li>
+        <li><code>gender</code></li>
+        <li><code>reasonable_adjustment_percentage</code> - percentage increase in time per level</li>
+    </ul>
+    <br>
+
+    <h4>Example Format</h4>
+    <pre>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>first_name</th>
+                <th>last_name</th>
+                <th>gender</th>
+                <th>email</th>
+                <th>client_supplied_id</th>
+                <th>reasonable_adjustment_percentage</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Harold</td>
+                <td>Waterman</td>
+                <td>Male</td>
+                <td>hwaterman@example.com</td>
+                <td>ABC001</td>
+                <td>0</td>
+            </tr>
+            <tr>
+                <td>Margaret</td>
+                <td>Ward</td>
+                <td>Female</td>
+                <td>mward@example.com</td>
+                <td>ABC002</td>
+                <td>0</td>
+            </tr>
+            <tr>
+                <td>Ryan</td>
+                <td>Cook</td>
+                <td>Male</td>
+                <td>rcook@example.com</td>
+                <td>ABC003</td>
+                <td>25</td>
+            </tr>
+        </tbody>
+    </table>
+    </pre>
+
+    {% crispy form %}
+{% endblock content %}
+{% block javascript %}
+    {{ block.super }}
+    <script type="text/javascript">
+    $(document).ready(function() {
+        $('button:submit').attr('disabled', true);
+        $('input:file').change(
+            function() {
+                if ($(this).val()) {
+                    $('button:submit').attr('disabled', false);
+                }
+            }
+        );
+    });
+    </script>
+{% endblock javascript %}

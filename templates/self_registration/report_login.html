@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% load staticfiles i18n crispy_forms_tags %}
+{% block title %} Report {% endblock %}
+{% block nav %}
+<nav class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+            <a class="navbar-brand">
+                <img alt="Arctic Shores" src="{% static 'images/arctic-shores-logo.png' %}" width="172">
+            </a>
+        </div>
+    </div>
+</nav>
+{% endblock nav %}
+
+{% block content %}
+    {% if self_registration_scheme.image %}
+        <img style="float:right; position: relative" src="{{ self_registration_scheme.image.url }}">
+    {% endif %}
+    <h3>Welcome to Arctic Shores!</h3> <p>Please enter your information below to retrieve your feedback report.</p>
+    <br>
+    {% crispy form %}
+    <br>
+    <h5>For support, please email <a href="{{ self_registration_scheme.support_email_address }}">{{ self_registration_scheme.support_email_address }}</a>.</h5>
+{% endblock %}

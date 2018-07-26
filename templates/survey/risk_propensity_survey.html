@@ -1,0 +1,35 @@
+{% extends "base-mobile.html" %}
+{% block content %}
+    <h4>About you</h4>
+    <div class="heading">
+    Below are a series of behaviours that we would like you to rate for the frequency in which you carry them out:
+        <ol>
+          <li>Done it several times</li>
+          <li>Done it</li>
+          <li>I could see myself doing it</li>
+          <li>I cannot see myself doing that</li>
+        </ol>
+    </div>
+    <div class="heading">
+        How much have you...
+    </div>
+    <form method="POST">
+      {% csrf_token %}
+      {% if form.non_field_errors %}
+        <ul>
+          {% for error in form.non_field_errors %}
+            <li>{{ error }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+
+      {% for field in form %}
+          <div id="{{ field.auto_id }}_container" class="field_container">
+            <div id="{{ field.auto_id }}_errors">{{ field.errors }}</div>
+            <div>{{ field.label_tag }}</div><div>{{ field }}</div>
+          </div>
+      {% endfor %}
+
+      <input id="finish_survey" type="submit" value="Finish" />
+    </form>
+{% endblock content %}

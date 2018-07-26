@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Delete candidate" %} {{ object }}{% endblock title %}
+
+{% block nav %}{% with section="programmes" %}{{ block.super }}{% endwith %}{% endblock nav %}
+
+{% block content %}
+<form action="" method="post">{% csrf_token %}
+    <p>Are you sure you want to delete "{{ object.full_name }}" from this programme?</p>
+    <button class="btn btn-danger" type="submit">Confirm</button>
+    <a href="{% url 'programme:players-list-view' object.programme.id %}" class="btn">Cancel</a>
+</form>
+{% endblock content %}

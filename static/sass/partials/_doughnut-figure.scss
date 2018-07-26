@@ -1,0 +1,32 @@
+/* Doughnut graph with text and caption (can use with a graph framework)
+
+Example:
+    <div class="doughnut-figure">
+        <div class="doughnut-figure__graph> <!-- Graph framework placeholder -->
+            <span class="doughnut-figure__value">10%</span>
+        </div>
+        <span class="doughnut-figure__name">Caption</span>
+    </div>
+*/
+
+.doughnut-figure {
+    position: relative;
+    display: inline-block;
+    padding: 0 2em;
+
+    .doughnut-figure__graph {
+        position: relative;
+    }
+
+    .doughnut-figure__value {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translateX(-50%) translateY(-50%);
+        font-size: 1.5em;
+    }
+
+    .doughnut-figure__name {
+        font-weight: bold;
+    }
+}

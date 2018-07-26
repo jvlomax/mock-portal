@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% load staticfiles i18n jinjas_must_die crispy_forms_tags %}
+
+{% block title %}{% trans "Reseller" %} {{ reseller.name }} | Permissions {% endblock title %}
+
+{% block nav %}{% with section="programmes" %}{{ block.super }}{% endwith %}{% endblock nav %}
+
+{% block breadcrumbs %}
+    Manage Companies &raquo;
+    {% if request.user.is_staff or request.user.resellers.count > 1 %}
+        <a href="{% url 'company:resellers' %}">Resellers</a> &raquo;
+    {% endif %}
+    <a href="{% url 'company:select' %}?reseller_id={{ reseller.id }}">{{ reseller.name }}</a> &raquo;
+    <a href="{% url 'company:reseller-permissions-list' reseller.id %}">Permissions</a> &raquo;
+    {% if target_user %}{{ target_user.front_end_label }}{% else %}Add{% endif %}
+{% endblock breadcrumbs %}
+
+{% block content %}
+    <h2>User Permissions - {{ reseller.name }}</h2>
+    <h3>{{ target_user.front_end_label }}</h3>
+    <p>Use the checkboxes below to grant or revoke permissions.</p>
+    {% crispy form %}
+{#    TODO #}
+    {% include 'company/modals/confirm_company_permission_edit.html' %}
+{% endblock %}
+
+{% block javascript %}
+    {{ block.super }}
+    <script type="text/javascript">
+        $(document).ready(function() {
+            function modalText() {
+                // If permissions have been changed, generate modal text explaining the implications of the change.
+                var initialAccess = "{{ form.initial_access }}" === "True";
+                var accessChanged = initialAccess !== $("#id_access").is(':checked');
+                var initialOwner = "{{ form.initial_owner }}" === "True";
+                var ownerChanged = initialOwner !== $("#id_owner").is(':checked');
+                var text = "<p>Are you sure you want to save these permissions?</p>\n";
+                if (accessChanged || ownerChanged) {
+                    var action = "";
+                    if (accessChanged && initialAccess) {
+                        action += "revoke access"
+                    } else if (accessChanged && !initialAccess) {
+                        action += "grant access"
+                    }
+
+                    if (accessChanged && ownerChanged) {
+                        action += " and "
+                        {# e.g. grant access and grant admin #}
+                    }
+
+                    if (ownerChanged && initialOwner) {
+                        action += "revoke admin"
+                    } else if (ownerChanged && !initialOwner) {
+                        action += "grant admin"
+                    }
+                    text +=
+                    "{% if reseller.company_set.all %}" +
+                    "<p>This action will additionally " + action + " permissions for the following companies and " +
+                        "programmes:</p>" +
+                    "<div style='overflow-y: scroll; height: 400px;'>" +
+                    "{% for company in reseller.company_set.all %}\n"+
+                    "<h5><i>{{ company.name }}</i></h5>\n"+
+                    "<ul>\n" +
+                    "{% for programme in company.programmes.all %}\n" +
+                    "<li>{{ programme.name }}</li>\n" +
+                    "{% empty %}<p><i>No programmes</i></p>" +
+                    "{% endfor %}\n" +
+                    "</ul>" +
+                    "{% endfor %}\n" +
+                    "{% endif %}" +
+                    "</div>";
+                }
+                return text
+            }
+            $('[id^=permission-edit-form-update]').click(function(event) {
+                event.preventDefault();
+                showModal('#confirmCompanyPermissionEditModal', modalText());
+            });
+        });
+    </script>
+{% endblock %}

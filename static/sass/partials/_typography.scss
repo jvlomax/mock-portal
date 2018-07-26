@@ -1,0 +1,15 @@
+/**
+ * Typography
+ */
+
+// font family variables
+$base-font-family: 'Noto Sans', sans-serif;
+$font-header: 'Noto Sans', sans-serif;
+
+body {
+    font-family: $base-font-family;
+}
+
+.link-main {
+    text-transform: uppercase;
+}

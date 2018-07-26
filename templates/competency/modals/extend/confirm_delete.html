@@ -1,0 +1,23 @@
+<!-- Modal -->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header text-center">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">{% block title %}{% endblock %}</h4>
+            </div>
+            <div id="confirmDeleteBody" class="modal-body text-center">
+                {% block body %}{% endblock %}
+            </div>
+            <div class="modal-footer">
+                <div class='text-center'>
+                <form action="{% block url %}{% endblock %}" method="post">
+                    {% csrf_token %}
+                    <button class="btn btn-danger" type="submit">Delete</button>
+                    <a id="confirm-no" class="btn" href="#">No</a>
+                </form>
+                </div>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->

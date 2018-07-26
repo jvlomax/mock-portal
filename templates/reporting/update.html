@@ -1,0 +1,52 @@
+{% extends "reporting/base.html" %}
+{% load crispy_forms_tags i18n static %}
+
+{% block breadcrumbs %}
+    {{ block.super }} &raquo; Edit Report
+{% endblock breadcrumbs %}
+
+{% block content %}
+{% if report.game_default %}
+    <br><br>
+    <div class="alert alert-danger" role="alert">
+        Warning: updates to game default reports may be visible across companies and programmes.
+    </div>
+{% endif %}
+
+<h3>Edit report</h3>
+<div>
+    <p>
+        The following substitutions are available in the custom content of the report:
+        <ul>
+            <li><strong>{% verbatim %}{{ first_name }}{% endverbatim %}</strong> the player's first name.</li>
+            <li><strong>{% verbatim %}{{ last_name }}{% endverbatim %}</strong> the player's last name.</li>
+        </ul>
+    </p>
+    <p>To create a page break for Cosmic style reports insert <strong>{% verbatim %}{{ page_break }}{% endverbatim %}</strong>.
+        NB: CKEditor will turn this into an HTML element by wrapping it with the selected paragraph format (adjacent to
+        "Styles" in toolbar), if the page break does not appear to be having any affect it's most likely because of this
+        format, try using "Normal" and contact support if problems persist. Page titles can be inserted into the introduction and supplementary pages by selecting the "Title" format in the editor toolbar.</p>
+    <p>To create a page break for Skyrise style reports use the "Heading 1" paragraph format to mark the heading as the start of the new page.</p>
+</div>
+<hr>
+{% crispy form %}
+{% endblock content %}
+
+{% block javascript %}
+{{ block.super }}
+    <script src="//cdn.ckeditor.com/4.4.6/full/ckeditor.js"></script>
+    <script>
+        var ckeditor_config = {
+            filebrowserBrowseUrl: "{% url 'ckeditor_browse' %}",
+            filebrowserUploadUrl: "{% url 'reporting:media-upload' report.pk %}",
+            baseHref: 'http://{{ request.get_host }}/media/reports/',
+            height: '500',
+            // Default text formats:
+            format_tags: 'p;title;h1;h2;h3;h4;h5;h6',
+            // Custom "Title" format for reports
+            format_title: { name: 'Title', element: 'div', attributes: { 'class': 'title' }},
+        }
+        CKEDITOR.replace('id_introductory_pages', ckeditor_config);
+        CKEDITOR.replace('id_supplementary_pages', ckeditor_config);
+    </script>
+{% endblock javascript %}

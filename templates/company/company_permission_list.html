@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% load staticfiles i18n %}
+
+{% block title %}{% trans "Company" %} {{ target_instance.name }} | Permissions {% endblock title %}
+
+{% block nav %}{% with section="companies" %}{{ block.super }}{% endwith %}{% endblock nav %}
+
+{% block breadcrumbs %}
+    Manage Companies &raquo;
+    {% if request.user.is_staff or request.user.resellers.count > 1 %}
+        <a href="{% url 'company:resellers' %}">Resellers</a> &raquo;
+    {% endif %}
+    <a href="{% url 'company:select' %}?reseller_id={{ target_instance.reseller_id }}">{{ target_instance.reseller.name }}</a> &raquo;
+    <a href="{% url 'company:select' %}?reseller_id={{ target_instance.reseller_id }}">Companies</a> &raquo;
+    {{ target_instance.name }} &raquo;
+    Permissions
+{% endblock breadcrumbs %}
+
+{% block content %}
+    <div class="row">
+        <h2 class="col-sm-10">User Permissions - Company - {{ target_instance.name }}</h2>
+        <a class="btn col-sm-2 pull-right" href="{% url 'company:permissions-add' target_instance.pk %}">
+            Add User
+        </a>
+    </div>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+          <th class="col-sm-4">User</th>
+          <th class="col-sm-2">Access</th>
+          <th class="col-sm-2">Owner</th>
+        </tr>
+        </thead>
+        {% for user, perms in object_list %}
+            <tr>
+                <td class="col-sm-4">
+                    {{ user.front_end_label }}
+                    {% if user.is_superuser %}
+                        <span class="label label-success">System Admin</span>
+                    {% elif not owner_permission in perms or request.user.is_superuser %}
+                        <a href="{% url 'company:permissions-edit' target_instance.id user.id %}">
+                            <span class="glyphicon glyphicon-edit"></span> Edit
+                        </a>
+                    {% endif %}
+                </td>
+                <td class="col-sm-2" title="User can view and edit this company.">
+                    {% if access_permission in perms %}
+                        <span class="glyphicon glyphicon-ok"></span>
+                    {% else %}
+                        <span class="glyphicon glyphicon-remove"></span>
+                    {% endif %}
+                </td>
+                <td class="col-sm-2"
+                    title="User can view and edit this company and additionally grant or revoke permissions of other users."
+                >
+                    {% if owner_permission in perms %}
+                        <span class="glyphicon glyphicon-ok"></span>
+                    {% else %}
+                        <span class="glyphicon glyphicon-remove"></span>
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}

@@ -1,0 +1,35 @@
+<h2><strong>Warning</strong></h2>
+
+<p>Self-Registration Scheme <strong>{{ self_registration_scheme.name }}</strong>
+    {{ self_registration_scheme.expired|yesno:"has expired, is close to expiry" }}.
+    This will {{ self_registration_scheme.expired|yesno:",soon " }}prevent candidates from registering themselves.</p>
+
+{% if self_registration_scheme.player_limit_reached %}
+    <p>The candidate limit of <strong>{{ self_registration_scheme.completed_player_count_limit }} candidates</strong>
+        for this scheme has been reached.</p>
+{% endif %}
+
+{% if self_registration_scheme.expiry_date_reached%}
+    <p>The expiry date for this scheme (<strong>{{ self_registration_scheme.expiry_date }}</strong>) has been reached.
+    </p>
+{% endif %}
+
+{% if self_registration_scheme.player_limit_close %}
+    <p>The candidate limit of <strong>{{ self_registration_scheme.completed_player_count_limit }} candidates</strong>
+        for this scheme is close to being reached.</p>
+{% endif %}
+
+{% if self_registration_scheme.expiry_date_close %}
+    <p>The expiry date for this scheme (<strong>{{ self_registration_scheme.expiry_date }}</strong>) is close to being
+        reached.</p>
+{% endif %}
+{% if self_registration_scheme.programme_set.exists %}
+    <p>This will affect the following programmes:</p>
+    <ul>
+        {% for url, name in programmes %}
+            <li><a href="{{ url }}">{{ name }}</a></li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>However, there are currently no programmes using this self-registration.</p>
+{% endif %}

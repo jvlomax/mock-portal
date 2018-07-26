@@ -1,0 +1,25 @@
+{# template/programme/_player_search.html #}
+{% comment %}
+    Usage: {% include 'programme/_player_search.html' %}
+    NOTE: programme and paginator objects must be in context
+{% endcomment %}
+
+<form action="?foo=bar" method="GET" class="form-inline pull-right">
+    <div class="btn-group">
+        <input
+          id="searchinput" type="search" name="q" class="form-control" size="35"
+          placeholder="Name, email, player key, client supplied id"
+          {% if request.GET.q %}value="{{ request.GET.q }}" style="background: #FFFFCC;"{% endif %}
+        >
+        {% if request.GET.game_completed %}
+            <input type="hidden" name="game_completed" value="{{ request.GET.game_completed }}">
+        {% endif %}
+    </div>
+    <button type="submit" class="btn-search">
+        <span class="glyphicon glyphicon-search"></span>
+        <span class="title">Search</span>
+    </button>
+    <div class="text-danger small" id="searchresult">
+        {% if request.GET.q or request.GET.game_completed %}Found {{ paginator.count }} out of {{ programme.players.count }} players.{% endif %}
+    </div>
+</form>

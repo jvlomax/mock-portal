@@ -1,0 +1,59 @@
+
+.trait {
+    border: solid #EDF2F2 1px;
+    margin-bottom: 10px;
+    padding: 10px;
+    background-color: #F8F9F9;
+}
+
+.slide {
+    margin-top: 20px;
+    margin-left: 20px;
+    width: 400px;
+    background: #ba274a !important; /* RED */
+}
+
+.slide-back {
+    position:absolute;
+    height:100%;
+}
+
+.steps {
+    pointer-events:none; /* Allow underlaying slider to be interacted with */
+    border: 1px solid transparent;
+    width: 398px;
+    position: relative;
+    height: 30px;
+    bottom: 22px;
+    padding: 4px;
+    border-radius: 2px;
+    font-family: "Arial";
+    font-weight: bold;
+    color: white;
+    right: 3px;
+}
+
+.tick {
+    border: 1px solid transparent;
+    position: absolute;
+    width: 1.2em;
+    margin-left: -.6em;
+    text-align:center;
+    left: 0;
+}
+
+.ui-slider .ui-slider-handle {
+    width: 11px !important;
+}
+.weighting input{
+    width: 400px !important;
+    margin-left: 20px;
+}
+
+.red-bg { background-color: #ba274a; }
+.green-bg { background-color: #45c45d; }
+.yellow-to-red-bg {
+    background: #e5d24a; /* Old browsers */
+    /* Put more yellow in */
+    background: linear-gradient(to right, #e5d24a 0%, #e5d24a 25%, #45c45d 100%);
+}

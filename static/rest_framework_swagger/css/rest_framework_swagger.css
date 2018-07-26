@@ -1,0 +1,25 @@
+#django-rest-swagger {
+    background: #00c0c0; 
+    color: #00c0c0; 
+    text-align:right; 
+    padding: 7px 0; 
+    font-size: 0em;
+}
+
+#django-rest-swagger a {
+    color: #fff;
+    text-decoration: none;
+}
+
+#logo, #show-wordnik-dev-icon, #input_baseUrl, #input_apiKey, #explore {
+    visibility: hidden;
+}
+
+/* Remove Try it out! */
+form.sandbox {
+    display: none !important;
+}
+
+#header {
+    background-color: #333 !important;
+}

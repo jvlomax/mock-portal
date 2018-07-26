@@ -1,0 +1,23 @@
+<!-- Modal -->
+<div class="modal fade" id="confirmProgrammeCloneModal" tabindex="-1" role="dialog" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header text-center">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				<h4 class="modal-title">Confirm copy</h4>
+			</div>
+			<div class="modal-body text-center">
+				Are you sure you want to copy this programme? This will create a new programme with the same settings as
+                this one.
+			</div>
+			<div class="modal-footer">
+				<div class='text-center'>
+				<form id="programmeCloneForm" action="" method="post">{% csrf_token %}
+				    <input id="confirm-yes" class="btn btn-danger" type="submit" value="Yes"/>
+					<a id="confirm-no" class="btn" href="#">No</a>
+				</form>
+				</div>
+			</div>
+		</div><!-- /.modal-content -->
+	</div><!-- /.modal-dialog -->
+</div><!-- /.modal -->

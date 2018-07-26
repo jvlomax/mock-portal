@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags i18n %}
+
+{% block title %}{% trans "Edit User" %}{% endblock title %}
+
+{% block nav %}{% with section="users" %}{{ block.super }}{% endwith %}{% endblock nav %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-lg-12">
+            <h2>Edit {{ user.type_as_string|capfirst }} User<br><small>{{ user.company.name }}</small></h2>
+            <h3 style="display: inline-block;">{{ user.name }}</h3>{% if user == request.user %} <span class="label label-success">You</span>{% endif %}
+            <br>
+            {% if user != request.user %}
+                <div class="pull-right">
+                    <a href="{% url 'users:deactivate' user.id %}" class="text-danger">
+                        <span class="glyphicon glyphicon-lock" aria-hidden="true"></span>
+                        Deactivate User
+                    </a>
+                </div>
+            {% endif %}
+            <form method="post">
+                {% csrf_token %}
+                {% crispy form %}
+                {% if user == request.user %}
+                  <p><a href="{% url 'account_change_password' %}">Change Password</a></p>
+                {% else %}
+                  <p><a href="{% url 'users:confirm_password_reset' user.id %}">Reset Password</a></p>
+                {% endif %}
+                <button type="submit" class="btn btn-primary">Save</button>
+                <a href="{% url 'users:manage' %}" class="btn">Cancel</a>
+            </form>
+        </div>
+    </div>
+{% endblock content %}

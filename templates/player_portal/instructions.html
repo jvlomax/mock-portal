@@ -1,0 +1,15 @@
+{% extends "player_portal/base.html" %}
+
+{% block title %} Games-Based Assessments Instructions {% endblock %}
+
+{% block content %}
+    <h1>Welcome!</h1>
+    <h4>Please find below instructions for downloading and playing Arctic Shores' Games-Based Assessments.</h4>
+
+    <hr>
+    {% if game %}
+        <img style="float: right; margin: 10px;" width="50%" height="50%" src="{{ game.screenshot.url }}">
+    {% endif %}
+
+    {{ body }}
+{% endblock %}

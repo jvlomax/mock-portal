@@ -1,0 +1,15 @@
+{% extends "reporting/base.html" %}
+{% load crispy_forms_tags %}
+
+{% block breadcrumbs %}
+    {{ block.super }} &raquo; Advanced Report Preview
+{% endblock breadcrumbs %}
+
+{% block content %}
+    <div class="row">
+        <div class="col col-sm-12">
+            <h1>Advanced Report Preview</h1>
+            {% crispy form %}
+        </div>
+    </div>
+{% endblock content %}

@@ -1,0 +1,34 @@
+/**
+ * Game List
+ */
+.game-list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+
+    .game-list-game {
+        display: flex;
+        flex-direction: column;
+        box-sizing: border-box;
+        width: 400px;
+        padding: 25px;
+
+        .game-logo {
+          align-self: center;
+          width: 256px;
+          height: 256px;
+        }
+
+        .game-title {
+          text-align: center;
+        }
+
+        .game-description {
+          flex: 1;
+        }
+
+        .game-list-downloads {
+          text-align: center;
+        }
+    }
+}

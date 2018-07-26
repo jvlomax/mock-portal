@@ -1,0 +1,36 @@
+<div class="modal fade" id="confirmGroup{{ group.id }}DeleteModal" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header text-center">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times</button>
+                <h4 class="modal-title">Confirm delete</h4>
+            </div>
+                <div id="group{{ group.id }}ConfirmDeleteBody" class="modal-body text-center">
+                    {% if group.programme_set.all %}
+                    <p>This Group is currently used by the following programmes:</p>
+                        <ul class="list-group">
+                        {% for programme in group.programme_set.all %}
+                        <li class="list-group-item">{{ programme.name}}</li>
+                        {% endfor %}
+                        </ul>
+                        <br>
+                        <p>
+                            They will no longer have an attached SOC job group if you delete this group and
+                            any SOC job scores calculated using this group will be deleted.
+                        </p>
+                    {% else %}
+                        <p>This group is currently not used by any programmes.</p>
+                    {% endif %}
+                    <p><b>Are you sure you want to delete this group?</b></p>
+                </div>
+            <div class="modal-footer">
+                <div class=text-center">
+                    <form id="deleteGroupForm" action="" method="POST">{% csrf_token %}
+                        <a id="confirm-yes" class="btn btn-danger" value="Yes" href="#">Yes</a>
+                        <a id="confirm-no" class="btn" href="#">No</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

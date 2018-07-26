@@ -1,0 +1,17 @@
+{% extends "player_portal/base.html" %}
+
+{% block title %} Your Report {% endblock %}
+
+{% block meta %}
+    {{ block.super }}
+    {# Automatic download of report #}
+    <meta http-equiv="refresh" content="1;URL='{{ report_url }}'" />
+{% endblock %}
+
+{% block content %}
+    <p>
+        Thank you for submitting your details. Your report download should begin shortly. Please retain a copy of
+        this report for your records, as the download link will expire in {{ download_expiry_time_in_days }} days.
+        If the download doesn't start automatically, please click <a href="{{ report_url }}">here</a> to start it.
+    </p>
+{% endblock %}

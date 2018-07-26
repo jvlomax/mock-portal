@@ -1,0 +1,5 @@
+{{ instruction_email_body }}
+
+{% for game in games %}
+    {{ game.name }} {{ game.android_url }} {{ game.ios_url }}
+{% endfor %}

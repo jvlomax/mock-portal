@@ -1,0 +1,137 @@
+{% load humanize %}
+{% load i18n %}
+{% load dict_lookup %}
+
+<p>
+    Hi {% verbatim %}{{ first_name }}{% endverbatim %},
+</p>
+
+{% block reminder_message %}{% endblock reminder_message %}
+
+<p>
+    We’re excited to invite you to take part in our brand new Game-Based Assessment{{ game_count|pluralize }} on your
+    mobile device. We are using th{{ game_count|pluralize:"is,ese" }} assessment{{ game_count|pluralize }} because
+    {{ game_count|pluralize:"it,they" }} provide{{ game_count|pluralize:"s," }} a fair and objective way to help us
+    understand your suitability for the role alongside other information.
+</p>
+<p>Not a gamer? Don't worry, no prior gaming experience is required and it won't affect your results. This is still a
+    fair and reliable psychometric assessment that is just presented in an easy-to-use, interactive format.</p>
+
+{% if practice_game %}
+    <p>
+        If you’ve never tried a Game-Based Assessment before you can have a go on our practice app,
+        {{ practice_game.base_name }}, as many times as you like.
+    </p>
+{% endif %}
+
+{% if player_key_expiry_days %}
+    <!-- NB: This causes a known edge case where a player with an explicit_expiry_date but no
+    programme.player_key_expiry_days will not be shown the assessment deadline in their instructions. The current
+    email generation prevents conditionals based on specific player info without use of 'verbatim' tags. -->
+    <p><strong>
+        The assessment{{ game_count|pluralize }} will expire in {% verbatim %}{{ remaining_assessment_days }}{% endverbatim %}
+        day(s).
+    </strong></p>
+{% endif %}
+
+<p>You have been asked to complete the following assessment{{ game_count|pluralize }}:</p>
+
+{% if aptitude_games %}
+    <p><b>{% for game in aptitude_games %}{{ game.name }}{% if not forloop.last %},{% endif %} {% endfor %}</b></p>
+    <p>You will be assessed on your reasoning ability in the following areas:</p>
+    <ul>
+        {% for level in aptitude_game_levels  %}
+            <li>{{ level.name }} ({{ level.total_time_minutes }} minutes)</li>
+        {% endfor %}
+    </ul>
+    <p>You may use a calculator if required and should have a pen and rough paper ready to help solve the problems. You must have
+    a good, stable internet connection at all times while undergoing th{{ aptitude_games.count|pluralize:"is,ese" }}
+    assessment{{ aptitude_games.count|pluralize }}.</p>
+{% endif %}
+
+{% if personality_games %}
+    <p><b>{% for game in personality_games %}{{ game.name }}{% if not forloop.last %},{% endif %} {% endfor %}</b></p>
+
+    <p>Th{{ personality_games.count|pluralize:"is,ese" }} {{ personality_games.count|pluralize:"is a,are" }} personality
+        assessment{{ personality_games.count|pluralize }} so there is no right or wrong way to approach
+        {{ personality_games.count|pluralize:"it,them" }}; simply follow the instructions and react to the scenarios
+        naturally. On average, th{{ personality_games.count|pluralize:"is,ese" }}
+        assessment{{ personality_games.count|pluralize }} take{{ personality_games.count|pluralize:"s," }} around 25-35
+        minutes to complete, but everyone is different and there is no time limit so please complete it at your own pace.
+        {% if autoemail_report %}We’ll even send you a personality report at the end of it.{% endif %}
+    </p>
+{% endif %}
+
+<p>
+    <b>If you need us to consider any reasonable adjustments for learning difficulties, please make us aware
+        before you start the assessment.
+    </b>
+</p>
+
+<p><b>Here's how to complete the assessment:</b></p>
+<ol>
+    <li><b>Download</b>. Follow the links provided below to download the app on to an Android/iOS smartphone or tablet
+    <b>manufactured within the last four years</b>. Detailed device requirements are listed on the relevant app
+        stores. Please ask a friend or family member if you can borrow theirs if you do not have an appropriate device.
+        Do not use emulators.
+    </li>
+    <li><b>Set-up</b>.
+        <ul>
+            <li>Find a quiet place free from distractions.</li>
+            <li>Make sure you have a good, stable WiFi or 4G/LTE connection and ample battery life.</li>
+            <li>Set your device to "do not disturb" and ensure distracting push notifications are disabled for social
+                media and messaging apps.</li>
+        </ul>
+    </li>
+    <li><b>Log in.</b> On commencing the assessment{{ game_count|pluralize }}, please enter your unique details:</li>
+</ol>
+<p style="text-align: center;">
+    Username / Player Key:
+    <b style="padding: 0.5em; font-size: 2em; color: #00c0c0;">{% verbatim %}{{ player_key }}{% endverbatim %}</b>
+</p>
+{% if password %}
+    <p style="text-align: center;">
+        Password{% if game_count > 1 %} (if requested){% endif %}: <b style="padding: 0.5em; font-size: 2em; color: #00c0c0;">{{ password }}</b>
+    </p>
+{% endif %}
+<br>
+
+{% for game in games_to_download %}
+    <p style="text-align: center">
+        <b>{{ game.base_name }}:</b>
+        <a href="{{ android_urls|keyvalue:game }}">Android Download</a> |
+        <a href="{{ game.ios_url }}">iOS Download</a> |
+        <a href="https://www.arcticshores.com/faq-2/#Candidates">FAQs</a>
+    </p>
+    {% if game.osx_url or game.windows_url %}
+        <p style="text-align: center">
+        <small>
+            If you do not have access to a supported mobile device, the following desktop versions of the assessment
+            are available:
+            {% if game.osx_url %}
+                <a href="{{ game.osx_url }}">Mac OSX Download</a> {% if game.windows_url %}| {% endif %}
+            {% endif %}
+            {% if game.windows_url %}<a href="{{ game.windows_url }}">Windows Download</a>{% endif %}
+        </small>
+        </p>
+    {% endif %}
+    <br>
+{% endfor %}
+
+{% if practice_game %}
+    <p>
+        If you would like to practise please download {{ practice_game.base_name }}:
+        <a href="{{ practice_game.android_url }}">Android Download</a>
+        | <a href="{{ practice_game.ios_url }}">iOS Download</a>
+    </p>
+{% endif %}
+
+<p>
+    If you have any issues, please email {% verbatim %}<a href="mailto:{{ support_email_address }}">{{ support_email_address }}{% endverbatim %}</a>
+    and include your username / player key, details about the make and model of your device, and the organisation you
+    have applied to.
+</p>
+
+<p>Kind regards</p>
+
+<p><strong>Arctic Shores Assessments</strong></p>

@@ -1,0 +1,23 @@
+{% extends "programme/base.html" %}
+{% load staticfiles i18n crispy_forms_tags %}
+
+{% block title %}{% trans "Update Norm Groups" %}{% endblock title %}
+
+{% block nav %}{% with section="programmes" %}{{ block.super }}{% endwith %}{% endblock nav %}
+
+{% block breadcrumbs %}
+    {{ block.super }}
+    &raquo; <a href="{% url 'programme:detail' programme.id %}">{{ programme.name }}</a>
+    &raquo; Update Norm Groups
+{% endblock breadcrumbs %}
+
+{% block programme %}
+    {{ block.super }}
+    <h3>Update Norm Groups</h3>
+{% endblock programme %}
+
+{% block content %}
+    <p><span class="label label-info">Arctic Shores Staff Only</span></p>
+    <p>Please select one norm group per assessment.</p>
+    {% crispy form %}
+{% endblock content %}

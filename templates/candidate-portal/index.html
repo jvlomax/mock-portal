@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>You have been directed to this page to retrieve your scores for a recent programme you took part in</h1>
+
+<h3>Please enter the UUID you have been assigned and submit to review your results</h3>
+<h4>This is completely anonymous</h4>
+
+<input name="uuid" type="text" id="uuid">
+<button onclick="getPlayerResults()">Get your Results</button>
+
+<script type="text/javascript">
+function getPlayerResults() {
+    var uuid =  document.getElementById('uuid').value;
+
+    window.location = "http://127.0.0.1:8000/results/player/" + uuid;
+}
+</script>
+{% endblock content %}

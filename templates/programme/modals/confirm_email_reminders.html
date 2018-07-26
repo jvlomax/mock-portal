@@ -1,0 +1,38 @@
+{% comment %}
+Takes in:
+    csrf_token
+    programme - programme in question
+    remaining - number of remainder emails remaining to be sent
+{% endcomment %}
+
+<!-- Modal -->
+<div class="modal fade" id="emailRemindersModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header text-center">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">Confirm email reminders</h4>
+            </div>
+            <div class="modal-body text-center">
+                {% if remaining == 1 %}
+                    Are you sure you want to send a reminder email to 1 candidate?
+                {% elif remaining > 1 %}
+                    Are you sure you want to send reminder emails to {{ remaining }} candidates?
+                {% else %}
+                    Are you sure you want to send reminder emails to all candidates?
+                {% endif %}
+            </div>
+            <div class="modal-footer">
+                <div class="text-center">
+                    <form method="post"
+                          action="{% url 'programme:players-email-bulk' programme.id programme.invitation_to_play_reminder_email.slug %}"
+                          style="display: inline">
+                        {% csrf_token %}
+                        <button class="btn btn-danger" type="submit">Yes</button>
+                    </form>
+                    <button id="confirm-no" type="button" class="btn" data-dismiss="modal">No</button>
+                </div>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->

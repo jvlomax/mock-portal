@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}Competency Frameworks{% endblock %}
+
+{% block nav %}{% with section="competency" %}{{ block.super }}{% endwith %}{% endblock nav %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <h3 class="col-sm-4">Competency Frameworks</h3>
+            <a class="btn pull-right" href="{% url 'competency:competency-framework-create' %}">
+                Create New Competency Framework
+            </a>
+        </div>
+        <br>
+        <div class="row">
+            <table class="table table-condensed">
+                <tr>
+                    <th>Framework Name</th>
+                    <th>Description</th>
+                </tr>
+
+                {% for competency_framework in object_list %}
+                    <tr>
+                        <td class="col-sm-4">
+                            <a href="{% url 'competency:competency-framework-edit' competency_framework_id=competency_framework.id %}">
+                                {{ competency_framework.name }}
+                            </a>
+                        </td>
+                        <td class="col-sm-8">{{ competency_framework.internal_description }}</td>
+{#                    TODO: Company and programmes. Django tables? #}
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+        <div class="row">
+            <a class="btn pull-right" href="{% url 'competency:competency-framework-create' %}">
+                Create New Competency Framework
+            </a>
+        </div>
+    </div>
+{% endblock %}

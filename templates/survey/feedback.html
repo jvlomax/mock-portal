@@ -1,0 +1,39 @@
+{% extends "base-mobile.html" %}
+{% load i18n %}
+{% block content %}
+    {% if progress_value %}<progress max="{{ progress_max }}" value="{{ progress_value }}"></progress>{% endif %}
+    <h4>{% trans "About our game" %}</h4>
+    <div id="heading">
+        <p>
+          {% blocktrans trimmed %}
+            Thanks for completing the psychometric game!
+            This game was developed and scientifically validated by a team of psychologists and game developers.
+          {% endblocktrans %}
+        </p>
+        <p>
+          {% blocktrans trimmed %}
+            We’re always looking to evaluate and improve our games.
+            Please give your feedback by answering the following statements:
+          {% endblocktrans %}
+        </p>
+    </div>
+    <hr>
+    <form method="POST">
+      {% csrf_token %}
+      <h4>{% trans "Keeping in touch" %}</h4>
+      <div class="heading">
+        {% blocktrans trimmed %}
+          At Arctic Shores we continues to develop and validate our games-based assessments. This means that data from your game play will be entered anonymously in a large database which we will use to continue to improve our scoring system. You can enter your email address below to receive this information. Your data will remain anonymous with the exception of being linked to that email address. This link will be stored internally in a secure database and under no circumstances will be made available to third parties.
+        {% endblocktrans %}
+      </div>
+
+      {% for field in form %}
+          <div id="{{ field.auto_id }}_container" class="field_container">
+            <div id="{{ field.auto_id }}_errors">{{ field.errors }}</div>
+            <div><p>{{ field.label_tag }}</p></div>
+            <div>{{ field }}</div>
+          </div>
+      {% endfor %}
+      <input id="save_contact" type="submit" value="{% trans 'Save' %}" />
+    </form>
+{% endblock content %}

@@ -1,0 +1,96 @@
+{% extends "programme/base.html" %}
+{% load i18n crispy_forms_tags %}
+{% load render_table from django_tables2 %}
+
+{% block title %}{% trans "Player details" %}{% endblock title %}
+
+{% block nav %}{% with section="programmes" %}{{ block.super }}{% endwith %}{% endblock nav %}
+
+{% block breadcrumbs %}
+    {{ block.super }}
+    &raquo; <a href="{% url 'programme:detail' programme.id %}">{{ programme.name }}</a>
+    &raquo; <a href="{% url 'programme:players-list-view' player.programme.id %}">All players</a>
+    &raquo; <a href="{{ player.get_absolute_path }}">{{ player.label }}</a>
+    &raquo; Reset individual levels
+{% endblock breadcrumbs %}
+
+{% block programme %}
+    {{ block.super }}
+{% endblock programme %}
+
+{% block content %}
+    <div class="content">
+        <div class="row">
+            <div class="col-xs-12">
+                <h3 class="player-detail-title">
+                    Reset {{ session.game.name }} Game Levels for {{  player.player_key }}
+                </h3>
+                <p>Session Key: {{ session.session_key }}</p>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-xs-12">
+                {% crispy form %}
+            </div>
+        </div>
+
+        {% if ability_events %}
+            <div class="row">
+                <div class="col-xs-12">
+                    <h3>Ability Game Events</h3>
+                </div>
+                <div class="col-xs-12">
+                    {% render_table ability_events %}
+                </div>
+            </div>
+        {% endif %}
+
+        {# There should always be session events #}
+        <div class="row">
+            <div class="col-xs-12">
+                <h3>General Game Events</h3>
+            </div>
+            <div class="col-xs-12">
+                {% if session_events %}
+                    {% render_table session_events %}
+                {% else %}
+                    <p>There are no session events</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="confirmLevelReset" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header text-center">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title">Confirm Level Reset</h4>
+                </div>
+                <div class="modal-body text-center">
+                    Are you sure you want to reset the level <span id="reset-level-name" style="font-weight: bold"></span>?
+                </div>
+                <div class="modal-footer">
+                    <div class='text-center'>
+                        <a id="confirm-yes" href="javascript: document.getElementById('submit-id-delete').form.submit();" class="btn btn-danger">Delete</a>
+                        <a id="confirm-no" class="btn" href="#">Cancel</a>
+                    </div>
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+{% endblock %}
+
+{% block javascript %}
+    {{ block.super }}
+
+    <script>
+        $("[id=submit-id-delete]").click(function(event) {
+            event.preventDefault();
+            $('#confirmLevelReset #reset-level-name').text($('#id_level_name').val());
+            showModal('#confirmLevelReset');
+        });
+    </script>
+{% endblock javascript %}

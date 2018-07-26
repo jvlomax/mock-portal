@@ -1,0 +1,127 @@
+// project specific CSS goes here
+
+
+@media (max-width: 991px) {
+  .navbar-header {
+      float: none;
+  }
+  .navbar-left,.navbar-right {
+      float: none !important;
+  }
+  .navbar-toggle {
+      display: block;
+  }
+  .navbar-collapse {
+      border-top: 1px solid transparent;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.1);
+  }
+  .navbar-fixed-top {
+      top: 0;
+      border-width: 0 0 1px;
+  }
+  .navbar-collapse.collapse {
+      display: none!important;
+  }
+  .navbar-nav {
+      float: none!important;
+      margin-top: 7.5px;
+  }
+  .navbar-nav>li {
+      float: none;
+  }
+  .navbar-nav>li>a {
+      padding-top: 10px;
+      padding-bottom: 10px;
+  }
+  .collapse.in{
+      display:block !important;
+  }
+}
+
+svg {
+  shape-rendering: crispEdges;
+}
+
+.bar rect {
+  fill: DarkGrey;
+  fill-opacity: .4;
+  -webkit-transition: fill-opacity 250ms linear;
+}
+
+.selecting .bar rect.selected {
+  fill-opacity: 1;
+}
+
+.bar text {
+  fill: #fff;
+}
+
+.axis path, .axis line {
+  fill: none;
+  stroke: #000;
+}
+
+.resize path {
+  fill: #666;
+  fill-opacity: .8;
+  stroke: #000;
+  stroke-width: 0px;
+}
+
+.brush .extent {
+  fill-opacity: .1;
+}
+
+.filter {
+  font: 11px sans-serif;
+  border-left: 2px solid #ffffff;
+  border-bottom: 1px solid #999;
+  padding: 5px 10px 5px 10px;
+  display: inline-block;
+}
+
+.filter:hover {
+  background-color: #fcfcff;
+}
+
+.filter .title {
+  width: 360;
+  float: left;
+}
+
+.filter .graph {
+  width: 600px;
+  float: right;
+}
+
+// bootstrap alert CSS, translated to the django-standard levels of
+// debug, info, success, warning, error
+.alert-debug {
+  color: black;
+  background-color: white;
+  border-color: #d6e9c6;
+}
+
+.alert-info {
+  color: #3a87ad;
+  background-color: #d9edf7;
+  border-color: #bce8f1;
+}
+
+.alert-success {
+  color: #468847;
+  background-color: #dff0d8;
+  border-color: #d6e9c6;
+}
+
+.alert-warning {
+  color: black;
+  background-color: orange;
+  border-color: #d6e9c6;
+}
+
+.alert-error {
+  color: #b94a48;
+  background-color: #f2dede;
+  border-color: #eed3d7;
+}

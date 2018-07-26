@@ -1,0 +1,50 @@
+{% extends "admin/base.html" %}
+{% load i18n staticfiles crispy_forms_tags %}
+
+{% block title %}Export Player Data{% endblock title %}
+
+{% block branding %}
+    <h1>Arctic Shores</h1>
+{% endblock branding %}
+
+{% block breadcrumbs %}
+    <div class="breadcrumbs">
+        <a href="{% url 'admin:index' %}">Home</a>
+        &rsaquo; <a href="{% url 'admin:app_list' 'metrics' %}">Metrics</a>
+        &rsaquo; <a href="{% url 'admin:metrics_player_changelist' %}">Players</a>
+        &rsaquo; Export Player Data
+    </div>
+{% endblock breadcrumbs %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-xs-12">
+            Export player data in CSV format with the chosen fields for
+            <strong>{{ player_count }}</strong> player{{ player_count|pluralize }}.
+        </div>
+    </div>
+
+    {% if player_count > 10 %}
+        <br>
+        <div class="row">
+            <div class="col-xs-12">
+                    As you have selected more than 10 players:
+                    <ul>
+                        <li>
+                            If <code>Game Variables</code> are selected, the report must be emailed because this
+                            could take a while (every 100 players will take ~5 minutes).
+                        <li>
+                            If <code>Game ("Session") Events</code> are selected, the report must be downloaded because
+                            the file size could be too large too email.
+                    </ul>
+            </div>
+        </div>
+    {% endif %}
+
+    <div class="row">
+        <div class="col-xs-12">
+            <h2>Select data to export</h2>
+            {% crispy form %}
+        </div>
+    </div>
+{% endblock content %}

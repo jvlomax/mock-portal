@@ -1,0 +1,16 @@
+{% extends "competency/modals/extend/confirm_delete.html" %}
+
+{% comment %}
+    Takes in:
+        - csrf_token
+        - role_id
+{% endcomment %}
+
+{% block title %}Are you sure you want to delete this Fit Profile?{% endblock %}
+
+{% block body %}
+    <strong>Warning</strong> Deleting this Fit Profile will delete all corresponding Fit Scores for all
+    players in this programme.
+{% endblock %}
+
+{% block url %}{% url 'competency:role-delete' role_id=role_id %}{% endblock %}

@@ -1,0 +1,19 @@
+
+{% extends 'programme/base.html' %}
+{% load staticfiles i18n crispy_forms_tags %}
+
+{% block title %}{% trans 'Update SOC Job Group' %}{% endblock title %}
+
+{% block nav %}{{ block.super }}{% endblock nav %}
+
+{% block breadcrumbs %}
+{% endblock breadcrumbs %}
+
+{% block programme %}
+    {{ block.super }}
+    <h3>Update SOC Job Group</h3>
+{% endblock programme %}
+
+{% block content %}
+    {% crispy form %}
+{% endblock content %}

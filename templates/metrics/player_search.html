@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% load django_tables2 %}
+
+{% block title %}Candidates{% endblock %}
+
+{% block nav %}{{ block.super }}{% endblock nav %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <h3 class="col-sm-2">Players</h3>
+        </div>
+        <hr>
+        {% render_table player_table "metrics/tables/player_search.html" %}
+    </div>
+{% endblock %}

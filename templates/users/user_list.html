@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags i18n %}
+
+{% block title %}{% trans "Users" %}{% endblock title %}
+
+{% block nav %}{% with section="users" %}{{ block.super }}{% endwith %}{% endblock nav %}
+
+{% block content %}
+<div class="container">
+  <div class="col-md-4">
+    <h2>Manage Users</h2>
+  </div>
+
+  <div class="col-md-6"></div>
+
+</div>
+
+<hr>
+
+
+  <div class="container">
+      <ul class="nav nav-tabs" role="tablist">
+        <li role="presentation" class="active"><a href="#client" aria-controls="clients" role="tab" data-toggle="tab">Client Users</a></li>
+        <li role="presentation"><a href="#reseller" role="tab" aria-controls="resellers" data-toggle="tab">Reseller Users</a></li>
+        <li role="presentation"><a href="#staff" role="tab" aria-controls="staff" data-toggle="tab">Staff Users</a></li>
+      </ul>
+
+      <div class="tab-content">
+          {% for group_type, group in user_groups.items %}
+              <div role="tabpanel" class="tab-pane" id="{{ group_type }}">
+              {% if not group_type == 'staff' %}
+                  <br>
+                  <a href="{% url 'users:create' %}?type={{ group_type }}" class="btn"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add {{ group_type }} user</a>
+                  <hr>
+              {% endif %}
+                {% for company, users in group %}
+                    <div class="row">
+                        <h4>{{ company.name }}</h4>
+                          <table class="table table-striped">
+                            <thead>
+                            <tr>
+                              <th class="col-sm-2">Name</th>
+                              <th class="col-sm-4">Email</th>
+                              <th class="col-sm-2">Security Question set?</th>
+                              <th class="col-sm-2">Last login</th>
+                              <th class="col-sm-2"></th>
+                            </tr>
+                            </thead>
+                        <tbody>
+                        {% for user in users %}
+                            <!-- NB: 'user' is user in list. 'request.user' is logged in user browsing list -->
+                              <tr>
+                                <td class="col-sm-2">{{ user.name }}{% if user == request.user %} <span class="label label-success">You</span>{% endif %}</td>
+                                <td class="col-sm-4">{{ user.email }}</td>
+                                <td class="col-sm-2">
+                                    {% if user.account_security_setup %}
+                                        <span class="glyphicon glyphicon-ok"></span> Yes
+                                    {% else %}
+                                        <span class="glyphicon glyphicon-remove"></span> No
+                                    {% endif %}
+                                </td>
+                                <td class="col-sm-2">{% if user.last_login %}{{ user.last_login }}{% else %}<i>User has never logged in</i>{% endif %}</td>
+                                <td class="col-sm-2">
+                                    <!-- Users with access to this page can edit themselves or any other non-staff user. Superuser can edit all. -->
+                                    {% if not user.is_staff or request.user == user or request.user.is_superuser %}
+                                        <a title="{% trans 'Edit User' %}" href="{% url 'users:edit' pk=user.pk %}" class="link" role="button">
+                                            <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
+                                            Edit
+                                        </a>
+                                    {% endif %}
+                                    &nbsp;
+                                    <!-- Users with access to this page can deactivate any non-staff user. Superuser can delete all apart from themselves. -->
+                                    {% if not user.is_staff and user != request.user or request.user.is_superuser and user != request.user %}
+                                        <a title="{% trans 'Deactivate User' %}" href="{% url 'users:deactivate' pk=user.pk %}" class="text-danger" role="button">
+                                            <span class="glyphicon glyphicon-lock"></span>
+                                            Deactivate
+                                        </a>
+                                    {% endif %}
+                                </td>
+                              </tr>
+                        {% empty %}
+                            <tr><td>No users found</td></tr>
+                        {% endfor %}
+
+                        </tbody>
+                      </table>
+                    </div>
+                      <hr>
+                {% endfor %}
+              </div>
+          {% endfor %}
+      </div>
+  </div>
+<script type="text/javascript">
+    // Required for bootstrap tabs
+    $('.nav-tabs a').click(function (e) {
+      e.preventDefault();
+      $(this).tab('show');
+    });
+    $(document).ready(function() {
+        // Set 'clients' as the first active tab on page load
+        $('.tab-pane#client').addClass('active');
+    });
+</script>
+{% endblock content %}

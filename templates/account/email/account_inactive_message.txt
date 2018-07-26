@@ -1,0 +1,9 @@
+{% load i18n %}
+
+{% blocktrans %}
+You're receiving this email because you, or someone else, has requested a password for your user account at {{ current_site }}.
+
+However, the account associated with "{{ email }}" has been deactivated, and you can no longer login.
+
+If you believe this is in error, please contact support.
+{% endblocktrans %}

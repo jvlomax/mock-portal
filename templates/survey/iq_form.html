@@ -1,0 +1,16 @@
+{% extends "base-mobile.html" %}
+{% load i18n crispy_forms_tags %}
+
+{% block content %}
+    {% if progress_value %}<progress max="{{ progress_max }}" value="{{ progress_value }}"></progress>{% endif %}
+    <h4>Aptitude Questionnaire</h4>
+    <div class="heading">
+      This questionnaire should take about 10 minutes to complete. Please read each question carefully then select the correct answer from the options given.
+    </div>
+    {% if form.errors %}
+        <p class="errors">
+            ** Please correct the errors below **
+        </p>
+    {% endif %}
+    {% crispy form %}
+{% endblock content %}

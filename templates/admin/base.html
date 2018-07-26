@@ -1,0 +1,36 @@
+{% extends "admin/base.html" %}
+{% load staticfiles %}
+
+{% block extrastyle %}
+    {# Hide bar for production website unless you are superuser #}
+    {% if request.user.is_superuser or ENVIRONMENT != 'production' %}
+        <!-- SHOW-ENVIRONMENT-WARNING -->
+        <style type="text/css">
+            body:before {
+                display: block;
+                line-height: 2;
+                text-align: center;
+                font-weight: bold;
+                color: white;
+                text-transform: uppercase;
+                background-color: {{ ENVIRONMENT_COLOUR }};
+                content: "{{ ENVIRONMENT }}";
+            }
+            .label {
+                display: inline;
+                padding: .2em .6em .3em;
+                font-size: 80%;
+                font-weight: bold;
+                line-height: 1;
+                color: #fff;
+                text-align: center;
+                white-space: nowrap;
+                vertical-align: baseline;
+                border-radius: .25em;
+            }
+            .label-default {
+                background-color: #777;
+            }
+        </style>
+    {% endif %}
+{% endblock %}

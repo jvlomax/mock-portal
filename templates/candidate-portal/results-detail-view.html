@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1> Your Player Results </h1>
+{% if player_results %}
+    <ul>
+    {% for trait in player_results %}
+        <li>{{ trait.trait }} : {{ trait.percentile }}%</li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p> Sorry this indentifier does not exist <a href=""> Try Again? </a> <p>
+{% endif %}
+{% endblock content %}

@@ -1,0 +1,123 @@
+{% extends "programme/base.html" %}
+{% load staticfiles i18n crispy_forms_tags %}
+{% block css %}
+    {{ block.super }}
+<style>
+    .panel-heading .accordion-toggle:after{
+        font-family: 'Glyphicons Halflings';
+        content: '\e114';
+        float: left;
+        colour: grey;
+    }
+    .panel-heading .accordion-toggle.collapsed:after{
+        content: '\e080';
+    }
+
+    .link-button {
+        color: #00c0c0;
+        border-bottom: none;
+    }
+    .modal +.panel{
+        margin-top: 5px;
+    }
+</style>
+{% block breadcrumbs %}
+{% endblock %}
+
+{% endblock css %}
+{% block title %}{% trans 'Add SOC Job Group' %}{% endblock title %}
+
+{% block nav %}{{ block.super }}{% endblock nav %}
+
+
+{% block content %}
+    <div class="row">
+        <div class="pull-right">
+            <a class="btn" href="{% url 'career:socjobgroup-create' %}">Create SOC Job Group</a>
+        </div>
+    </div>
+    <br>
+    <br>
+    {% if object_list %}
+        <div id="accordion" class="panel-group">
+        {% for group in object_list %}
+            {% include 'career/modals/confirm_group_delete.html' %}
+            <div class="panel panel-default">
+                <div class="panel-heading clearfix">
+                        <h4 class="panel-title">
+                        <span class="accordion-toggle collapsed" data-parent="#accordion" data-toggle="collapse" href="#collapse{{ forloop.counter }}" aria-expanded="false">
+                            {{ group.name|capfirst }} {% if group.company %} ({{ group.company }} Only) {% endif %}
+                        </span>
+                            <div class="pull-right">
+                                <a class="link-button" style="margin-right: 5px;" href="{% url "career:socjobgroup-update" pk=group.pk %}" role="button">
+                                    <span class="glyphicon glyphicon-edit"></span>Edit
+                                </a>
+                                <a class="link-button" id="deleteGroup-{{ group.id }}" href="{% url "career:socjobgroup-delete" pk=group.id %}" role="button" data-toggle="tooltip" data-placement="right" title="Delete this group">
+                                    <span class="glyphicon glyphicon-trash"/>
+                                </a>
+                            </div>
+                        </h4>
+                </div>
+                {% if group.programme_set.all %}
+                    <div class="panel-body">
+                            <h5><strong>This group is used in the following programmes:</strong></h5>
+                            <ul>
+                            {% for programme in  group.programme_set.all %}
+                                <li>{{ programme.name }}</li>
+                            {% endfor %}
+                            </ul>
+                    </div>
+                {% endif %}
+                <div id="collapse{{ forloop.counter }}" class="panel-collapse collapse" aria-labelledby="heading{{ forloop.counter }}" data-parent="#accordion">
+                    <table class="table table-condensed">
+                    <thead>
+                        <tr>
+                            <th>SOC code</th>
+                            <th>SOC description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for job in group.jobs.all %}
+                        <tr>
+                            <td>{{ job.soc_code }}</td>
+                            <td>{{ job.soc_description }}</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                    </table>
+                </div>
+            </div>
+        {% endfor %}
+        </div>
+    {% else %}
+        <div class="row">
+            <h4>No SOC job groups created.</h4>
+        </div>
+    {% endif %}
+    {% if socjobgroup_list|length > 4 %}
+        <div class="row">
+            <div class="pull-right">
+                <a class="btn" href="{% url 'career:socjobgroup-create' %}">Create SOC Job Group</a>
+            </div>
+        </div>
+    {% endif %}
+
+{% endblock content %}
+{% block javascript %}
+{{ block.super }}
+<script>
+$(function () {
+  $('[data-toggle="tooltip"]').tooltip({delay: {"show": 500, "hide": 100}})
+})
+$("[id^=deleteGroup-]").click(function(event){
+    event.preventDefault();
+    var group_id = $(this).prop("id").split("-")[1];
+    var href = $(this).attr('href');
+    showModal("#confirmGroup" + group_id + "DeleteModal", undefined, function(event){
+        var deleteGroupForm = $("#deleteGroupForm");
+        deleteGroupForm.attr('action', href)
+        deleteGroupForm.submit();
+    });
+})
+</script>
+{% endblock javascript %}

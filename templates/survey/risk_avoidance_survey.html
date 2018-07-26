@@ -1,0 +1,40 @@
+{% extends "base-mobile.html" %}
+{% block content %}
+    <h4>About you</h4>
+    <div class="heading">
+        Below, there are phrases describing people's behaviors. Please describe how accurately each statement describes you. Describe yourself as you generally are now, not as you wish to be in the future. Describe yourself as you honestly see yourself, in relation to other people you know of the same sex as you are, and roughly your same age.
+    <div class="heading">
+        So that you can describe yourself in an honest manner, your responses will be kept in absolute confidence.
+    </div>
+    <div class="heading">
+        Please read each statement carefully, and then choose the option that corresponds to you most appropriately:
+    </div>
+    <div class="heading">
+        <ol>
+            <li>Very Inaccurate</li>
+            <li>Moderately Inaccurate</li>
+            <li>Neither Inaccurate or Accurate</li>
+            <li>Moderately Accurate</li>
+            <li>Very Accurate</li>
+        </ol>
+    </div>
+    <form method="POST">
+      {% csrf_token %}
+      {% if form.non_field_errors %}
+        <ul>
+          {% for error in form.non_field_errors %}
+            <li>{{ error }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+
+      {% for field in form %}
+          <div id="{{ field.auto_id }}_container" class="field_container">
+            <div id="{{ field.auto_id }}_errors">{{ field.errors }}</div>
+            <div>{{ field.label_tag }}</div><div>{{ field }}</div>
+          </div>
+      {% endfor %}
+
+      <input id="next_survey" type="submit" value="Next" />
+    </form>
+{% endblock content %}

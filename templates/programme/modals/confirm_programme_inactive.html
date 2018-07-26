@@ -1,0 +1,25 @@
+<!-- Modal -->
+<div class="modal fade" id="confirmProgrammeInactiveModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header text-center">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title">Are you sure?</h4>
+            </div>
+            <div class="modal-body text-center">
+                Are you sure you want to deactivate
+                {% if programme %}<strong>{{ programme.name }}</strong>{% else %}this programme{% endif %}?
+                This will prevent candidates from logging in and taking part in any assessment as part of this programme.
+            </div>
+            <div class="modal-footer">
+                <div class='text-center'>
+                    <form id="programmeInactive" action="">
+                        {% csrf_token %}
+                        <input id="confirm-yes" class="btn btn-danger" type="submit" value="Yes"/>
+                        <a id="confirm-no" class="btn" href="#">No</a>
+                    </form>
+                </div>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->

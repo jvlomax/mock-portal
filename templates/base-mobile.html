@@ -1,0 +1,22 @@
+{% load staticfiles i18n %}
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width,user-scalable=no">
+  {% block css %}
+    <link href="{% static 'css/mobile.css' %}" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Noto+Sans" rel="stylesheet">
+  {% endblock css %}
+</head>
+  <body>
+    <img src="{% static 'images/logo-small-shadow.png' %}" class="logo">
+    {% block content %}
+    {% endblock content %}
+
+    <div id="footer">
+        &copy; 2015 Arctic Shores Ltd
+    </div>
+    {% block javascript %}
+    {% endblock javascript %}
+  </body>
+</html>

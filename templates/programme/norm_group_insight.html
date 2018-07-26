@@ -1,0 +1,254 @@
+{% extends 'programme/base.html' %}
+{% load staticfiles i18n %}
+
+{% block title %}{% trans "Norm Group List" %}{% endblock title %}
+{% block nav %}{% with section="programmes" %}{{ block.super }}{% endwith %}{% endblock nav %}
+
+{% block breadcrumbs %}
+    {{ block.super }} &raquo; <a href="{% url 'programme:detail' programme.id %}">{{ programme.name }}</a> &raquo; {{ norm_group_insight.norm_group.name }}
+{% endblock breadcrumbs %}
+
+{% block programme %}
+    {{ block.super }}
+    <h3>{{ norm_group_insight.norm_group.name }}</h3>
+{% endblock programme %}
+
+{% block content %}
+
+<div class="row">
+	<div class="col-xs-12">
+    <p>
+        This page provides in depth insights into norm group <strong>{{ norm_group_insight.norm_group.name }}</strong> attached to programme <strong>{{ programme.name }}</strong>. In addition to basic demographic information, please note the following:
+    </p>
+    <ul>
+       <li>
+           The norm group size may be lower than expected if some candidates didn't complete their assessment.
+       </li>
+        <li>
+            Trait and fit score counts may be lower than expected if some candidates didn't complete the relevant game levels.
+        </li>
+    </ul>
+
+    {% with norm_group=norm_group_insight.norm_group %}
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <span class="label label-primary">General</span><br><br>
+                            </div>
+                            <div class="col-xs-2">
+                                <strong>Game:</strong><br>
+                                <strong>Scoring Key:</strong><br>
+                                <strong>Scoring Key Version:</strong><br>
+                                <strong>Company:</strong><br>
+                                <br>
+                                <strong>Norm group size:</strong>
+                            </div>
+                            <div class="col-xs-3">
+                                {{ norm_group.game }}<br>
+                                {{ norm_group.scoring_key_class }}<br>
+                                {{ norm_group.scoring_key_version }}<br>
+                                {{ norm_group.company|default:"<span class='label label-default'>All</span>" }}<br>
+                                <br>
+                                {% if norm_group_insight.session_count == 0 %}
+                                    <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                                {% endif %}
+                                {{ norm_group_insight.session_count }} sessions <small>(from {{ norm_group_insight.player_count }} candidates)</small>
+                            </div>
+                            <div class="col-xs-2">
+                                <strong>Role Sector:</strong><br>
+                                <strong>Education Level:</strong><br>
+                                <strong>Role Type:</strong><br>
+                                <strong>Assessment Context:</strong><br>
+                                <br>
+                                <strong>Location:</strong>
+                            </div>
+                            <div class="col-xs-4">
+                                {{ norm_group.get_role_sector_display|default:"Not set" }}<br>
+                                {{ norm_group.get_education_level_display|default:"Not set" }}<br>
+                                {{ norm_group.get_role_type_display|default:"Not set" }}<br>
+                                {{ norm_group.get_assessment_context_display|default:"Not set" }}<br>
+                                <br>
+                                {{ norm_group.get_location_display|default:"Not set" }}
+                            </div>
+                            <div class="col-xs-1">
+                                {% if not norm_group.active %}
+                                     <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                                     <em><small>A newer version of this norm group may exist.</small></em>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <span class="label label-primary">Item Banks</span><br><br>
+                            </div>
+                            <div class="col-xs-2">
+                                {% for trait, item_bank in norm_group_insight.item_bank_trait_dict.items %}
+                                    <strong>{{ trait }}:</strong><br>
+                                {% endfor %}
+                            </div>
+                            <div class="col-xs-2">
+                                {% for trait, item_bank in norm_group_insight.item_bank_trait_dict.items %}
+                                    {{ item_bank.name|default:"Not set" }}<br>
+                                {% endfor %}
+                            </div>
+                            <div class="col-xs-8">
+                                {% for trait, item_bank in norm_group_insight.item_bank_trait_dict.items %}
+                                    {{ item_bank.internal_description }}<br>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <span class="label label-primary">Description</span><br><br>
+                            </div>
+                            <div class="col-xs-5">
+                                <strong>Public Description</strong><br><br>
+                                {{ norm_group.public_description|default:"None" }}
+                            </div>
+                            <div class="col-xs-7">
+                                <strong>Internal Description</strong><br><br>
+                                {{ norm_group.description|default:"None" }}
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <span class="label label-primary">Demographics</span><br><br>
+                            </div>
+                            <div class="col-xs-12">
+                                <div class="table-responsive">
+                                    <table class="table table-hover">
+                                        <tbody>
+                                            <tr>
+                                                <th>Provided Gender</th>
+                                                <td>{{ norm_group_insight.provided_gender }}</td>
+                                            </tr>
+                                            <tr>
+                                                <th>Assumed Gender</th>
+                                                <td>{{ norm_group_insight.assumed_gender }}</td>
+                                            </tr>
+                                            <tr>
+                                                <th>Ethnicity</th>
+                                                <td>{{ norm_group_insight.ethnicity }}</td>
+                                            </tr>
+                                            <tr>
+                                                <th>Age</th>
+                                                <td>{{ norm_group_insight.age }}</td>
+                                            </tr>
+                                            <tr>
+                                                <th>Education</th>
+                                                <td>{{ norm_group_insight.education_level }}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <p>
+                                    <span class="glyphicon glyphicon glyphicon-info-sign" aria-hidden="true"></span>
+                                    &nbsp; The source of demographic information is <em>usually</em> post-game surveys.
+                                </p>
+                                <p>
+                                    <span class="glyphicon glyphicon glyphicon-info-sign" aria-hidden="true"></span>
+                                    &nbsp; The gender is assumed when it is "Unknown" or they "Prefer not to say".
+                                    There is no minimum confidence threshold for making the assumption (e.g. in terms
+                                    of sample size or probabilities).
+                                </p>
+                                <p>
+                                    <span class="glyphicon glyphicon glyphicon-info-sign" aria-hidden="true"></span>
+                                    &nbsp; Age is often provided as a range in surveys. For example, if a person selects
+                                    18-24, we pretend they said 21.
+                                </p>
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <span class="label label-primary">Stats</span><br><br>
+                            </div>
+                            <div class="col-xs-6">
+                                <strong>Traits</strong><br><br>
+                                Number of candidates in norm group contributing to each trait.
+                                <canvas id="graphTraits" width="550" height="500"></canvas>
+                            </div>
+                            <div class="col-xs-6">
+                                <strong>Fit Profiles</strong><br><br>
+                                Number of candidates in norm group contributing to each fit profile.
+                                {% if norm_group_insight.fit_profiles %}
+                                    <canvas id="graphFit" width="550" height="500"></canvas>
+                                {% else %}
+                                    <br><br><em>No fit profiles in programme.</em>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-1"></div>
+        </div>
+    {% endwith %}
+	</div>
+</div>
+{% endblock content %}
+
+{% block javascript %}
+{{ block.super }}
+<script src="{% static 'js/Chart.min.js' %}?v=1"></script>
+<script>
+    var settings = function(title, axis_label) {
+        return {
+            type: 'horizontalBar',
+            data: {
+                datasets: [{
+                    label: title,
+                    backgroundColor: "rgba(51,51,51,0.2)",
+                    borderColor: "rgba(0,192,192,0.5)",
+                    hoverBackgroundColor: "rgba(0,192,192,0.5)",
+                    hoverBorderColor: "rgba(51,51,51,0.2)",
+                    borderWidth: 2
+                }
+                ]
+            },
+            options: {
+                responsive: false,
+                tooltips: {
+                    mode: 'index',
+                    intersect: true
+                },
+                legend: {
+                    display: false
+                },
+                scales: {
+                    xAxes: [{
+                        ticks: {
+                            min: 0,
+                            max: {{ norm_group_insight.session_count }}
+                        },
+                        scaleLabel: {
+                            display: true,
+                            labelString: axis_label
+                        }
+                    }]
+                }
+            }
+        };
+    };
+
+    /* Trait Count Chart */
+    var traitSettings = settings("Traits", "Number of candidates");
+    traitSettings.data.labels = ["{{ norm_group_insight.traits|join:'","' }}"];
+    traitSettings.data.datasets[0].data = [{{ norm_group_insight.trait_counts|join:"," }}];
+    new Chart(document.getElementById("graphTraits").getContext("2d"), traitSettings);
+
+    /* Fit Profile Count Chart */
+    {% if norm_group_insight.fit_profiles %}
+        var fitSettings = settings("Fit Profiles", "Number of candidates");
+        fitSettings.data.labels = ["{{ norm_group_insight.fit_profiles|join:'","' }}"];
+        fitSettings.data.datasets[0].data = [{{ norm_group_insight.fit_score_counts|join:"," }}];
+        new Chart(document.getElementById("graphFit").getContext("2d"), fitSettings);
+    {% endif %}
+</script>
+{% endblock %}

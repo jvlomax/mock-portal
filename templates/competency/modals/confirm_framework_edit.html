@@ -1,0 +1,15 @@
+{% extends "competency/modals/extend/confirm_edit.html" %}
+
+{% block title %}
+    {% if is_new_competency_framework %}
+        Confirm new Competency Framework
+    {% else %}
+        Confirm changing the Competency Framework
+    {% endif %}
+{% endblock %}
+
+{% block body %}
+    <p>
+        <strong>IMPORTANT:</strong> editing this competency framework will not re-scoring existing players
+    </p>
+{% endblock %}

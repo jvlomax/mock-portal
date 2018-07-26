@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% load i18n crispy_forms_tags %}
+
+{% block title %}{% trans "Create user" %}{% endblock title %}
+
+{% block nav %}{% with section="users" %}{{ block.super }}{% endwith %}{% endblock nav %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-lg-12">
+            <h1>Add {{ user_type.name|lower|capfirst }} User</h1>
+            {% if user_type.name == 'CLIENT' %}
+                <p>A Client User's access is limited to viewing the programmes owned by the company they represent</p>
+            {% elif user_type.name == 'RESELLER' %}
+                <p>A Reseller User's access is limited to programmes managed by the reseller(s) selected below</p>
+            {% endif %}
+            <p>The new user will be emailed instructions for setting a new password.</p>
+            <form method="post">
+                {% csrf_token %}
+                {% crispy form %}
+                <button type="submit" class="btn btn-primary">Add User</button>
+                <a href="{% url 'users:manage' %}" class="btn">Cancel</a>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock content %}
+

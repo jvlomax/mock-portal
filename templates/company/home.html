@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% load i18n staticfiles %}
+
+{% block title %}{% trans "Home" %}{% endblock title %}
+
+{% block content %}
+<div class="row">
+    <div class="col-xs-12">
+        <h2>{{ company.name }}</h2>
+        <hr>
+    </div>
+</div>
+<div class="home-icons">
+    <div class="row">
+        {% with is_staff=request.user.is_staff is_reseller=request.user.is_reseller %}
+            <div class="col-sm-{% if is_staff %}3{% elif is_reseller %}4{% else %}6{% endif %} home-icon home-icon-01">
+                <a href="{% url 'programme:index' %}">
+                    <img src="{% static 'images/icon_programmes.png' %}" alt="Programmes" class="img-responsive">
+                    <h3 class="btn btn-white">{% trans "Programmes" %}</h3>
+                </a>
+                <p class="text">Create and manage recruitment programmes, candidate lists, and
+                assessment results.</p>
+            </div>
+            {% if is_staff or is_reseller %}
+                <div class="col-sm-{% if is_staff %}3{% else %}4{% endif %} home-icon home-icon-02">
+                    <a href="{% url 'company:resellers' %}">
+                        <img src="{% static 'images/icon_users.png' %}" alt="Roles" class="img-responsive">
+                        <h3 class="btn btn-white">{% trans "Companies" %}</h3>
+                    </a>
+                    <p class="text">Create and manage companies{% if is_staff %} and resellers{% endif %}.</p>
+                </div>
+            {% endif %}
+            {% if is_staff %}
+                <div class="col-sm-3 home-icon home-icon-03">
+                    <a href="{% url 'reporting:index' %}">
+                        <img src="{% static 'images/icon_programmes.png' %}" alt="Reports" class="img-responsive">
+                        <h3 class="btn btn-white">{% trans "Reports" %}</h3>
+                    </a>
+                    <p class="text">
+                        <span class="label label-info">Arctic Shores Staff</span><br>
+                        Create and manage reports.
+                    </p>
+                </div>
+            {% endif %}
+            <div class="col-sm-{% if is_staff %}3{% elif is_reseller %}4{% else %}6{% endif %} home-icon home-icon-04">
+                <a href="{% url 'game:game-list' %}">
+                    <img src="{% static 'images/icon_games.png' %}" alt="Assessments" class="img-responsive">
+                    <h3 class="btn btn-white">{% trans "Assessments" %}</h3>
+                </a>
+                <p class="text">Explore available game-based assessments.</p>
+            </div>
+        {% endwith %}
+    </div>
+</div>
+
+{% endblock content %}
+

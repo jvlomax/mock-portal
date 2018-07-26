@@ -1,0 +1,43 @@
+{% extends "base-mobile.html" %}
+
+{% load i18n %}
+
+{% block content %}
+    {% if progress_value %}
+        <progress max="{{ progress_max }}" value="{{ progress_value }}"></progress>
+    {% endif %}
+    {% block survey_header_section %}
+      <h4>{% trans "About you" %}</h4>
+      <div class="heading">
+          {% blocktrans trimmed %}
+              Thank you for playing! We would be grateful if you could tell us a little about yourself to help with our study. No personally identifying information is asked for here.
+          {% endblocktrans %}
+      </div>
+    {% endblock survey_header_section %}
+
+    {% if form.errors %}
+        <p class="errors">
+          {% trans "Please correct the errors below." %}
+        </p>
+    {% endif %}
+
+    <form method="POST">
+      {% csrf_token %}
+      {% if form.non_field_errors %}
+        <ul>
+          {% for error in form.non_field_errors %}
+            <li>{{ error }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+
+      {% for field in form %}
+          <div id="{{ field.auto_id }}_container" class="field_container">
+            <div id="{{ field.auto_id }}_errors">{{ field.errors }}</div>
+            <div>{{ field.label_tag }}</div><div>{{ field }}</div>
+          </div>
+      {% endfor %}
+
+      <input id="save_contact" type="submit" value="{% trans 'Save' %}" />
+    </form>
+{% endblock content %}

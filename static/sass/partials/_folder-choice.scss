@@ -1,0 +1,24 @@
+.folder-choice {
+  width: 125px;
+  display: block;
+
+  select, .new-folder-name, .submit {
+    box-sizing: border-box;
+    width: 100%;
+  }
+
+
+  select {
+    display: block;
+  }
+
+  .new-folder-name, .submit {
+    display: none;
+  }
+
+  &.creating-new {
+    .new-folder-name, .submit {
+      display: block;
+    }
+  }
+}

@@ -1,0 +1,20 @@
+{% extends "base-mobile.html" %}
+{% load i18n crispy_forms_tags %}
+{% block content %}
+    {% if progress_value %}<progress max="{{ progress_max }}" value="{{ progress_value }}"></progress>{% endif %}
+    <h4>Personality Questionnaire</h4>
+    <div class="heading">
+      This questionnaire should take you about 10 minutes to complete. Below are phrases describing people's personality.
+      Please read each statement carefully then select how accurately the statement describes you.
+    </div>
+    {% if form.errors %}
+        <p class="errors">
+            ** Please correct the errors below **
+        </p>
+    {% endif %}
+    <div class="heading">
+      I...
+    </div>
+    <br>
+    {% crispy form %}
+{% endblock content %}

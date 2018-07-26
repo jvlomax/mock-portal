@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}Server Error (500){% endblock title %}
+
+{% block content %}
+    <h1>Looks like something went wrong!</h1>
+
+    {% if request.sentry.id %}
+        <p>
+            We track these errors automatically, but if the problem persists feel
+            free to contact us at <a href="{{ SUPPORT_EMAIL }}">{{ SUPPORT_EMAIL }}</a>
+            with the reference <strong>{{ request.sentry.id }}</strong> (copy and paste
+            the reference; do not take a screenshot).
+        </p>
+
+        {% if request.user %}
+            <script src="https://cdn.ravenjs.com/3.15.0/raven.min.js"></script>
+            <script>
+                function showSentryReportDialog() {
+                    Raven.showReportDialog({
+                        eventId: '{{ request.sentry.id }}',
+                        // Public DSN
+                        dsn: 'https://da9628aa0a1f41c18dc298f475322280@sentry.io/51938'
+                    });
+                    // Auto-fill name and email in dynamically created form
+                    // This timeout is hacky but nicer than a MutationObserver
+                    interval = setInterval(function() {
+                        if (document.getElementById('id_name')) {
+                            document.getElementById('id_name').value = '{{ request.user.name }}';
+                            document.getElementById('id_email').value = '{{ request.user.email }}';
+                            clearInterval(interval);
+                        }
+                    }, 1000);
+                }
+            </script>
+            <p>
+                You may <a href="javascript:void(0)" onclick="showSentryReportDialog();">provide additional details</a>
+                about what you were trying to do.
+            </p>
+        {% endif %}
+    {% else %}
+        <p>
+            We track these errors automatically, but if the problem persists feel
+            free to contact us.
+        </p>
+    {% endif %}
+
+{% endblock content %}

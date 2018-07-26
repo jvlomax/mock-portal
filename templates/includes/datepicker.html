@@ -1,0 +1,19 @@
+{# Include this HTML file to apply the jQuery UI datepicker widget to fields using form_fields.DatePickerField #}
+<link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+<script
+  src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"
+  integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU="
+  crossorigin="anonymous">
+</script>
+<style>
+    {# Override datepicker current date colour #}
+    .ui-state-highlight {
+      border: 1px solid #66afe9 !important;
+      background: #e7f1f8 !important;
+    }
+</style>
+<script>
+    $(function() {
+        $(".datepicker").datepicker({dateFormat: 'dd/mm/yy'});
+    });
+</script>

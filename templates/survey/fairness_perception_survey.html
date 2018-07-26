@@ -1,0 +1,40 @@
+{% extends "base-mobile.html" %}
+{% block content %}
+    {% if progress_value %}<progress max="{{ progress_max }}" value="{{ progress_value }}"></progress>{% endif %}
+    <h4>Your thoughts about this test</h4>
+    <div class="heading">
+      With this set of questions we are interested in understanding how people feel about playing a science-based mobile game that measures their disposition compared to filling in traditional personality tests.
+      <br><br>
+      The main difference between the two methods is that traditional questionnaires ask you to provide information about yourself, relying on your honesty and self-awareness; whereas science-based mobile games observe how you act and react in situations specially designed to elicit your true dispositions.
+    </div>
+
+    {% if form.errors %}
+      <p class="errors">
+        ** Please correct the errors below **
+      </p>
+    {% endif %}
+
+    <p>
+      In comparison with traditional tests, I feel that a science-based mobile game:
+    </p>
+
+    <form method="POST">
+      {% csrf_token %}
+      {% if form.non_field_errors %}
+        <ul>
+          {% for error in form.non_field_errors %}
+            <li>{{ error }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+
+      {% for field in form %}
+          <div id="{{ field.auto_id }}_container" class="field_container">
+            <div id="{{ field.auto_id }}_errors">{{ field.errors }}</div>
+            <div>{{ field.label_tag }}</div><div>{{ field }}</div>
+          </div>
+      {% endfor %}
+
+      <input id="save_contact" type="submit" value="Save" />
+    </form>
+{% endblock content %}

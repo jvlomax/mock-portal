@@ -1,0 +1,26 @@
+{% extends "programme/base.html" %}
+{% load staticfiles i18n crispy_forms_tags %}
+
+{% block title %}{% trans "Update candidate" %}{% endblock title %}
+
+{% block nav %}{% with section="programmes" %}{{ block.super }}{% endwith %}{% endblock nav %}
+
+{% block breadcrumbs %}
+    {{ block.super }}
+    &raquo; <a href="{% url 'programme:detail' programme.id %}">{{ programme.name }}</a>
+    &raquo; <a href="{% url 'programme:players-list-view' player.programme.id %}">All candidates</a>
+    &raquo; <a href="{% url 'programme:players-detail' programme.id player.player_id %}">{{ player.label }}</a>
+    &raquo; Update candidate
+{% endblock breadcrumbs %}
+
+{% block programme %}
+	{{ block.super }}
+	<h3>Update Candidate</h3>
+	<br>
+{% endblock programme %}
+
+{% block content %}
+{% include "includes/datepicker.html" %}
+<h4>{{ player.full_name }}</h4>
+{% crispy form %}
+{% endblock content %}

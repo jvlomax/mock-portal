@@ -1,0 +1,58 @@
+{% extends "programme/base.html" %}
+{% load staticfiles i18n %}
+
+{% block title %}{% trans "Programme" %} {{ programme.name }} | Permissions {% endblock title %}
+
+{% block nav %}{% with section="programmes" %}{{ block.super }}{% endwith %}{% endblock nav %}
+
+{% block breadcrumbs %}
+    {{ block.super }} &raquo; <a href="{% url 'programme:detail' programme.id %}">{{ programme.name }}</a> &raquo; Permissions
+{% endblock breadcrumbs %}
+
+{% block content %}
+    <div class="row">
+        <h2 class="col-sm-6">User Permissions - {{ programme.name }}</h2>
+        <a class="btn col-sm-2 pull-right" href="{% url 'programme:permissions-add' programme.pk %}">
+            Add User
+        </a>
+    </div>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+          <th class="col-sm-4">User</th>
+          <th class="col-sm-2">Access</th>
+          <th class="col-sm-2">Owner</th>
+        </tr>
+        </thead>
+        {% for user, perms in object_list %}
+            <tr>
+                <td class="col-sm-4">
+                    {{ user.front_end_label }}
+                    {% if user.is_superuser %}
+                        <span class="label label-success">System Admin</span>
+                    {% elif not owner_permission in perms or request.user.is_superuser %}
+                        <a href="{% url 'programme:permissions-edit' programme.id user.id %}">
+                            <span class="glyphicon glyphicon-edit"></span> Edit
+                        </a>
+                    {% endif %}
+                </td>
+                <td class="col-sm-2" title="User can view and edit this programme.">
+                    {% if access_permission in perms %}
+                        <span class="glyphicon glyphicon-ok"></span>
+                    {% else %}
+                        <span class="glyphicon glyphicon-remove"></span>
+                    {% endif %}
+                </td>
+                <td class="col-sm-2"
+                    title="User can view and edit this programme and additionally grant or revoke permissions of other users."
+                >
+                    {% if owner_permission in perms %}
+                        <span class="glyphicon glyphicon-ok"></span>
+                    {% else %}
+                        <span class="glyphicon glyphicon-remove"></span>
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}

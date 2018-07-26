@@ -1,0 +1,21 @@
+{% extends "player_portal/base.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %} Select Your Report {% endblock %}
+
+{% block content %}
+    {% if not games_complete %}
+        <p>
+            Your report has not yet been generated. If you have recently completed all games,please check again in a few
+            minutes, otherwise please review the instructions you received on registration. If the problem persists
+            please email <a href="mailto:{{ support_email_address }}">{{ support_email_address }}</a>.
+        </p>
+    {% elif not scoring_complete %}
+        <p>
+            Your report has not yet been generated. Please check again in a few minutes. If the problem persists
+            please email <a href="mailto:{{ support_email_address }}">{{ support_email_address }}</a>.
+        </p>
+    {% else %}
+        {% crispy form %}
+    {% endif %}
+{% endblock %}

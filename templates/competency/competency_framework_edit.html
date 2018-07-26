@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+
+{% block title %}Competency Framework Edit{% endblock %}
+
+{% block nav %}{{ block.super }}{% endblock nav %}
+
+{% block css %}
+    <style>
+        .competency {
+            border: solid #EDF2F2 1px;
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #F8F9F9;
+        }
+        .competency-framework {
+            margin-bottom: 10px;
+            border: solid #EDF2F2 1px;
+            width: 100%;
+            padding: 10px;
+            padding-bottom: 0;
+            background-color: #F8F9F9;
+        }
+        #id_name {
+            width: 100%;
+        }
+
+        #id_internal_description {
+            width: 100%;
+            height: 100px;
+        }
+    </style>
+    {{ block.super }}
+{% endblock %}
+
+{% block content %}
+    <h2>
+        {{ is_new_competency_framework|yesno:"Add New,Edit" }} Competency Framework
+    </h2>
+    <p>
+        <span class="label label-info">Editable by Arctic Shores Staff Only</span>
+    </p>
+    <form id="edit-form" action="" method="POST">
+        {% if form.errors %}
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="alert alert-danger">
+                        <p>Please correct errors below. Your changes have not yet been saved.</p>
+                    </div>
+                    {% if form.non_field_errors %}
+                        <ul>
+                            {% for error in form.non_field_errors %}
+                                <li style="color:#a94442;">{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
+
+        {% csrf_token %}
+        <div class="competency-framework">
+            {% for field in form.visible_fields %}
+                <div class="row">
+                    <div class="col-xs-12 col-sm-9 col-md-6">
+                        <div><strong>{{ field.label }}: </strong></div>
+                        {% if field.errors %}
+                            <span style="color:#a94442;">
+                                {{ field.errors }}
+                            </span>
+                        {% endif %}
+                        <div>{{ field }}</div>
+                    </div>
+                </div>
+                <br>
+            {% endfor %}
+            {% for field in form.hidden_fields %}
+                {{ field }}
+            {% endfor %}
+        </div>
+        {% if not is_new_competency_framework %}  {# Competencys are added to new framework via wizard #}
+            <legend>
+                Competencies
+                <a class="link" href="{% url 'competency:competency-create' competency_framework_id=form.instance.id %}">
+                    <small><span style="font-size: 15px" class="glyphicon glyphicon-edit" aria-hidden="true"></span> Add </small>
+                </a>
+            </legend>
+            <p>
+                The individual competencies that make up this Framework
+            </p>
+
+            <div class="competencies">
+                {% for competency in form.instance.competencies.all %}
+                    <div class="competency">
+                        <div class="row">
+                            <div class="col-md-10">
+                                <strong>Competency: </strong>{{ competency.name }}
+                                <a href="{% url 'competency:competency-edit' competency.competency_framework_id competency.id %}">
+                                   <span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </form>
+    <br>
+    <a
+    {% if is_new_competency_framework %}
+        id="confirm-competency-framework-create"
+        href="javascript: document.getElementById('edit-form').submit();"
+    {% else %}
+        id="confirm-competency-framework-change"
+        href="javascript: void(0);"
+    {% endif %}
+        class="btn">Save
+    </a>
+    <a id="cancel-competency-framework-change" class="btn" href="#">Cancel</a>
+    {% if not is_new_competency_framework %}
+        {% include "competency/modals/confirm_framework_edit.html" %}  {# Don't need confirmation modal for new objects #}
+        {% if can_delete %}
+            {% include "competency/modals/confirm_framework_delete.html" with csrf_token=csrf_token competency_framework_id=form.instance.id only %}
+            <a id='confirm-competency-framework-delete' href="javascript: void(0)" class="btn btn-danger">
+                <span class="glyphicon glyphicon-trash"></span>
+                Delete
+            </a>
+        {% endif %}
+    {% endif %}
+    {% include "competency/modals/confirm_framework_cancel.html" %}
+
+
+{% endblock %}
+
+{% block javascript %}
+    {{ block.super }}
+    <script type="text/javascript">
+        $("[id=cancel-competency-framework-change]").click(function(event) {
+            event.preventDefault();
+            showModal('#confirmCancelChange');
+        });
+        $("[id=confirm-competency-framework-change]").click(function(event) {
+            event.preventDefault();
+            showModal('#confirmEdit');
+        });
+        $("[id=confirm-competency-framework-delete]").click(function(event) {
+            event.preventDefault();
+            showModal('#confirmDeleteModal');
+        });
+    </script>
+{% endblock %}

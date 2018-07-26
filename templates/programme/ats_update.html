@@ -1,0 +1,38 @@
+{% extends "programme/base.html" %}
+{% load staticfiles i18n crispy_forms_tags %}
+
+{% block title %}{% trans "Update ATS" %}{% endblock title %}
+
+{% block nav %}{% with section="programmes" %}{{ block.super }}{% endwith %}{% endblock nav %}
+
+{% block breadcrumbs %}
+    {{ block.super }}
+    &raquo; <a href="{% url 'programme:detail' programme.id %}">{{ programme.name }}</a>
+    &raquo; Update ATS
+{% endblock breadcrumbs %}
+
+{% block programme %}
+	{{ block.super }}
+	<h3>Update Applicant Tracking System</h3>
+	<br>
+{% endblock programme %}
+
+{% block content %}
+{% crispy form %}
+{% endblock content %}
+
+{% block javascript %}
+    {{ block.super }}
+    <script type="text/javascript">
+        {# Set programme ats_email_player_invite checkbox to 'true' as default for ATS objects with #}
+        {# email_player_invite_default set to True                                                  #}
+        $('#id_ats').change(function (){
+            if ({{ email_invite_default_true|safe }}.indexOf(this.value) != -1) {
+                $('#id_ats_email_player_invite').prop('checked', true);
+            }
+            else {
+                $('#id_ats_email_player_invite').prop('checked', false);
+            }
+        });
+    </script>
+{% endblock %}

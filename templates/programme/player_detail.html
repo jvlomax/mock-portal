@@ -1,0 +1,689 @@
+{% extends "programme/base.html" %}
+{% load staticfiles i18n crispy_forms_tags %}
+
+{% block title %}{% trans "Candidate details" %}{% endblock title %}
+{% block nav %}{% with section="programmes" %}{{ block.super }}{% endwith %}{% endblock nav %}
+
+{% block breadcrumbs %}
+    {{ block.super }}
+    &raquo; <a href="{% url 'programme:detail' programme.id %}">{{ programme.name }}</a>
+    &raquo; <a href="{% url 'programme:players-list-view' player.programme.id %}">All candidates</a>
+    &raquo; {{ player.label }}
+{% endblock breadcrumbs %}
+
+{% block programme %}
+    {{ block.super }}
+{% endblock programme %}
+
+{% block content %}
+<div class="content">
+    <div class="row">
+        <div class="col-md-6">
+
+            <h3 class="player-detail-title">
+                <a href="#" class="star" data-ajax-target="{% url 'portal-api:player-update' player.pk %}">
+                    <span class="{{ player.starred|yesno:"starred," }} glyphicon glyphicon-star"></span>
+                </a>
+                {{ player.label }}
+                <a href="{% url 'programme:players-update' object.programme.id object.pk %}" class="link" role="button">
+                    <span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit
+                </a>
+            </h3>
+
+            <p>Username / Player Key: {{ object.player_key }}</p>
+            {% if skyrise_in_programme %}
+                <p>Password: {{ player.programme.pseudo_password }}</p>
+            {% endif %}
+            {% if player.email %}
+                <p>Email: {{ player.email }}</p>
+            {% endif %}
+            {% if player.client_supplied_id %}
+                <p>Client supplied id: {{ player.client_supplied_id }}</p>
+            {% endif %}
+            {% if player.gender %}
+                <p>Gender: {{ player.get_gender_display }}</p>
+            {% endif %}
+            {% if player.reasonable_adjustment_percentage > 0 %}
+                <p>Reasonable Adjustment Percentage: {{ player.reasonable_adjustment_percentage }}%</p>
+            {% endif %}
+            {% if player.atsmeta.profile_url %}
+                <p><a href="{{ player.atsmeta.profile_url }}">External Link to Profile on the ATS Website</a></p>
+            {% endif %}
+            {% if player.expiry_date and not player.games_complete %}
+                <p>
+                    Expiry Date: {{ player.expiry_date|date:"M. d, Y, H:i" }} {{ player.expiry_date.tzinfo }}
+                    {% if player.is_expired %}<span class="label label-default">Expired</span>{% endif %}
+                </p>
+            {% endif %}
+        </div>
+
+        <!-- PLAYER NOTE -->
+        <div class="col-md-6">
+            <div class="panel panel-default player-note-panel">
+                <div class="panel-heading">
+                    <h3 class="panel-title">
+                        Notes
+                        <!-- Explicitly check that the note exists and has content. The content field can be blank
+                             so a PlayerNote object can exist with no content. From the users perspective updating
+                             the PlayerNote object in this case is the same as creating a new object, therefore show
+                             the "Add" button in the panel body rather than the "Edit" button in the right-hand side
+                             of the panel title. -->
+                        {% if player.note and player.note.content %}
+                            <span class="text-right pull-right">
+                                <a class="link" role="button" id="toggle-player-note-form">
+                                    <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
+                                    Edit
+                                </a>
+                            </span>
+                        {% endif %}
+                    </h3>
+                </div>
+
+                <div class="panel-body">
+                    <div class="player-note-container">
+                        <div class="player-note-content">
+                            {% if player.note and player.note.content %}
+                                <p class="player-note-panel__text">
+                                    {{ player.note.content|linebreaksbr }}
+                                </p>
+                            {% else %}
+                                <a class="link" role="button" id="toggle-player-note-form">
+                                    <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
+                                    Add
+                                </a>
+                            {% endif %}
+                        </div>
+
+                        <div class="player-note-form-container">
+                            {% crispy note_form %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- END PLAYER NOTE -->
+
+    </div>
+
+    <script src="{% static 'js/easypiechart.js' %}"></script>
+
+    {% include "programme/player_detail/_fit_scores.html" with request=request player=player personality_fitscores=personality_fitscores aptitude_fitscores=aptitude_fitscores personality_roles=personality_roles aptitude_roles=aptitude_roles roles_to_report_on=roles_to_report_on only %}
+
+    {% if personality_normed_scores or aptitude_normed_scores %}
+        <div class="row">
+            <div class="col-md-12">
+                <hr>
+            </div>
+        </div>
+        <div class="row">
+            {% if personality_normed_scores %}
+                <div class="col-md-6">
+                  <h3>Personality Profile</h3>
+                  <ul class="nav nav-tabs" role="tablist">
+                    <li role="presentation" class="active"><a href="#stens" aria-controls="stens" role="tab" data-toggle="tab">Stens</a></li>
+                    <li role="presentation"><a href="#normalisedScores" role="tab" aria-controls="normalisedScores" data-toggle="tab">Z-Score</a></li>
+                  </ul>
+                  <div class="tab-content">
+                      <div role="tabpanel" class="tab-pane" id="stens">
+                        <canvas id="graphStens" width="570" height="400"></canvas>
+                      </div>
+                      <div role="tabpanel" class="tab-pane" id="normalisedScores">
+                        <canvas id="graphNormalisedScores" width="570" height="400"></canvas>
+                      </div>
+                  </div>
+                </div>
+            {% endif %}
+            {% if riasec_profile %}
+                <div class="col-md-6">
+                    <h3>RIASEC Profile</h3>
+                    <h4 style="text-align: center;">{% for label in riasec_profile.label_triplet %}{{ label }} ({{ label|first }})&nbsp;&nbsp; {% endfor %}</h4>
+                    <canvas id="graphRIASEC" width="570" height="400"></canvas>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Aptitude Scores -->
+        {% if aptitude_normed_scores or user.is_staff and aptitude_breakdown %}
+            <div class="row">
+                {% if aptitude_normed_scores %}
+                    <div class="col-md-4">
+                        <h3>Aptitude Percentile Scores</h3>
+                        {% for score in aptitude_normed_scores %}
+                            <p{% if user.is_staff %} title="Exact percentile (staff only): {{ score.percentile_rounded }}"{% endif %}>
+                                {{ score.trait.name }}: <strong>{{ score.get_score_as_text }}</strong>
+                            </p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                {# Aptitude breakdown for Arctic Shores staff #}
+                {% if user.is_staff and aptitude_breakdown %}
+                    <h3>
+                        Aptitude Score Breakdown
+                        <small><span class="label label-info">Arctic Shores Staff</span></small>
+                    </h3>
+                    {% for session_results in aptitude_breakdown %}
+                        <div class="col-xs-8">
+                            {% for level_results in session_results.results %}
+                                <div class="col-xs-4">
+                                    <strong>{{ level_results.level }}</strong>
+                                    <em>
+                                        {% if level_results.status == 'completed' %}
+                                            {% trans "Completed" %}
+                                        {% elif level_results.status == 'unscored' %}
+                                            {% trans "Completed (but not yet scored)" %}
+                                        {% elif level_results.status == 'playing' %}
+                                            {% trans "Currently playing" %}
+                                        {% else %}
+                                            {% trans "Not Started" %}
+                                        {% endif %}
+                                    </em>
+                                    <p><em>
+                                        {% trans "Time (mins)" %}:
+                                        {% if level_results.minutes_taken %}
+                                            {{ level_results.minutes_taken }} /
+                                        {% endif %}
+                                        {{ level_results.minutes_allowed }}
+                                        {% if level_results.did_timeout %}
+                                            ({% trans "Ran out of time" %})
+                                        {% endif %}
+                                    </em></p>
+                                    <p>
+                                        {% if level_results.num_correct >= 0 %}
+                                            <strong>{% trans "Scored" %}:</strong> {{ level_results.num_correct }} / {{ level_results.num_questions }}
+                                        {% else %}
+                                            <strong>{% trans "#Questions" %}</strong> {{ level_results.num_questions }}
+                                        {% endif %}
+                                        {% if level_results.num_attempted >= 0 %}
+                                            <br>
+                                            <em>
+                                                {% if level_results.num_attempted < level_results.num_questions %}
+                                                    (Attempted {{ level_results.num_attempted }} questions)
+                                                {% else %}
+                                                    (Attempted all questions)
+                                                {% endif %}
+                                            </em>
+                                        {% endif %}
+                                        <br>
+                                        <em>Item Bank: {{ level_results.item_bank }}</em>
+                                    </p>
+                                    <p>
+                                    </p>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+        {% endif %}
+        <!-- SOC SCORES -->
+        {% if SOC_scores %}
+            <div class="row">
+                <div class="col-xs-12">
+                    <h3 style="display: inline;">SOC Scores</h3>
+                    &nbsp
+                    <h4 style="display: inline;">
+                        <a title="Show all SOC scores" class="link" data-toggle="modal" data-target="#SOCScoreModal" href="" role="button">
+                            <span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+                            View all
+                        </a>
+                    </h4>
+                    {% include "programme/player_detail/soc_score_table.html" with SOC_scores=SOC_scores|slice:":5" only %}
+                </div>
+            </div>
+        {% endif %}
+        <!-- SOCSCORE MODAL -->
+        {% include "programme/modals/SOC_score.html" with SOC_scores=SOC_scores %}
+        <!-- REPORTS -->
+        <br>
+        <div class="row">
+            <div class="col-xs-12">
+                <!-- Only show download manager report option for staff users. Other users will have the option to
+                     download this report if there are no fitscores. If there are fitscores, they will be able to
+                     download the more relevant profile fit score and aptitude sift score reports.  -->
+                {% if user.is_staff %}
+                    <div class="btn-group">
+                        <a href="{% url 'reporting:download-manager-report' player.player_id %}" class="btn btn-xs">
+                            <span class="glyphicon glyphicon-save"></span> Download manager report
+                        </a>
+                    </div>
+                {% endif %}
+
+                <div class="btn-group">
+                    {% crispy download_candidate_reports_form %}
+                </div>
+            </div>
+        </div>
+        <br>
+    {% endif %}
+
+    <!-- EMAIL -->
+    <hr>
+    <h3>Emails</h3>
+
+    {% if player.invitation_email_sent %}
+        <p>An <strong>{{ player.programme.invitation_to_play_email.get_email_type_display.lower }}</strong> email was sent to this candidate on {{ player.invitation_email_sent.timestamp }}</p>
+    {% else %}
+        This candidate has <strong>not</strong> been sent an <strong>{{ player.programme.invitation_to_play_email.get_email_type_display.lower }}</strong> email.
+
+        {% if not player.games_complete and player.email %}
+            {# Forms to submit the invitation emails #}
+            {# In order to keep the styling with the Bootstrap drop-down buttons, the forms must be outside .btn-group #}
+            {# So we use a normal link in the drop-down, which uses JavaScript to submit these forms. #}
+            {# Note that this differs to the reminder emails because there is no confirmation modal dialog. #}
+            <form name="sendInvitationEmail"
+                  method="post"
+                  action="{% url 'programme:players-email' player.programme_id player.player_id player.programme.invitation_to_play_email.slug %}"
+                  style="display: none;"
+            >
+                {% csrf_token %}
+            </form>
+            <form name="sendInvitationEmailAndToSelf"
+                  method="post"
+                  action="{% url 'programme:players-email' player.programme_id player.player_id player.programme.invitation_to_play_email.slug %}"
+                  style="display: none;"
+            >
+                <input type="hidden" name="self" value="1"/>
+                {% csrf_token %}
+            </form>
+
+            {# Buttons to send invitation emails #}
+            <div class="btn-group">
+                {# This JavaScript-based link submits the above forms #}
+                <a href="javascript: document.sendInvitationEmail.submit();"
+                   class="btn btn-sm"
+                   role="button"
+                >
+                    Send invitation
+                </a>
+                <button type="button" class="btn btn-sm dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                    <span class="caret"></span>
+                    <span class="sr-only">Toggle Dropdown</span>
+                </button>
+                <ul class="dropdown-menu" role="menu">
+                    <li>
+                        <a href="javascript: document.sendInvitationEmailAndToSelf.submit();">
+                            Send invitation and email self a copy
+                        </a>
+                    </li>
+                    <li>
+                        <a href="" data-toggle="modal" data-target=".bs-email-modal">Preview</a>
+                    </li>
+                </ul>
+            </div>
+        {% endif %}
+    {% endif %}
+
+
+    {% if player.reminder_email_sent %}
+        <p>An <strong>{{ player.programme.invitation_to_play_reminder_email.get_email_type_display.lower }}</strong> email was last sent to this candidate on {{ player.reminder_email_sent.timestamp }}</p>
+
+        {% if not player.games_complete %}
+            <div class="btn-group">
+                {# This link opens a modal dialog #}
+                <a href="{% url 'programme:players-email' player.programme_id player.player_id player.programme.invitation_to_play_reminder_email.slug %}" class="sendReminder btn btn-sm" role="button">
+                    Send Another Reminder
+                </a>
+                <button type="button" class="btn btn-sm dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                    <span class="caret"></span>
+                    <span class="sr-only">Toggle Dropdown</span>
+                </button>
+                <ul class="dropdown-menu" role="menu">
+                    <li>
+                        {# This link opens a modal dialog #}
+                        <a class="sendReminder" href="{% url 'programme:players-email' player.programme_id player.player_id player.programme.invitation_to_play_reminder_email.slug %}?self=1">
+                            Send another reminder and email self a copy
+                        </a>
+                    </li>
+                    <li>
+                        <a href="" data-toggle="modal" data-target=".bs-email-modal">Preview</a>
+                    </li>
+                </ul>
+            </div>
+        {% endif %}
+    {% elif player.invitation_email_sent %}
+        <p>This candidate has <strong>not</strong> been sent an <strong>{{ player.programme.invitation_to_play_reminder_email.get_email_type_display.lower }}</strong> email</p>
+
+        {% if player.invitation_email_sent and not player.games_complete %}
+            <div class="btn-group">
+                {# This link opens a modal dialog #}
+                <a href="{% url 'programme:players-email' player.programme_id player.player_id player.programme.invitation_to_play_reminder_email.slug %}" class="sendReminder btn btn-sm" role="button">
+                    Send Reminder
+                </a>
+                <button type="button" class="btn btn-sm dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                    <span class="caret"></span>
+                    <span class="sr-only">Toggle Dropdown</span>
+                </button>
+                <ul class="dropdown-menu" role="menu">
+                    <li>
+                        {# This link opens a modal dialog #}
+                        <a class="sendReminder" href="{% url 'programme:players-email' player.programme_id player.player_id player.programme.invitation_to_play_reminder_email.slug %}?self=1">
+                            Send reminder and email self a copy
+                        </a>
+                    </li>
+                    <li>
+                        <a href="" data-toggle="modal" data-target=".bs-email-modal">Preview</a>
+                    </li>
+                </ul>
+            </div>
+        {% endif %}
+    {% endif %}
+
+    {% if player.games_complete %}
+        {% if player.report_sent %}
+            <p>This candidate was emailed a <strong>report</strong> on {{ player.report_sent.timestamp }}.</p>
+        {% else %}
+            <p>This candidate has <strong>not</strong> been sent a report.</p>
+        {% endif %}
+
+        <div class="btn-group">
+            <form name="sendReportEmail"
+                  method="post"
+                  action="{% url 'programme:players-email' player.programme_id player.player_id player.programme.report_email.slug %}"
+                  style="display: none;"
+            >
+                {% csrf_token %}
+            </form>
+
+            <a {% if not programme.reports.exists %}disabled
+               {% else %}href="javascript: document.sendReportEmail.submit();"
+               {% endif %}class="btn btn-xs"
+               {% if player.report_sent %}title="Report last sent {{ player.report_sent.timestamp }}"{% endif %}>
+                {% if player.report_sent %}Resend candidate report(s) to candidate{% else %}Email candidate report(s) to candidate{% endif %}
+            </a>
+        </div>
+    {% endif %}
+    <!-- END EMAIL -->
+
+    <!-- GAMES -->
+    <hr>
+    <h3>Assessments</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th style="width: 5em;">Assessment</th>
+                <th style="width: 5em;">Progress</th>
+                <th style="width: 20em;">Device</th>
+                <th style="width: 20em;">Assessment Stats</th>
+                <th>Candidate Data</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for game, session in games_and_sessions %}
+            <tr id="{{ game.pk }}">
+                <td id="game">{{ game.name }}</td>
+                <td>
+                    {% if not session %}
+                        <span class="label label-danger">Not started</span>
+                    {% elif not session.session_complete %}
+                        <span class="label label-warning">In Progress</span>
+                        v{{ session.game_version_as_str }}
+                    {%  else %}
+                        <span class="label label-success">Complete</span>
+                        v{{ session.game_version_as_str }}
+                    {% endif %}
+                </td>
+                <td>
+                    {% with device_info=session.device_info %}
+                        <span class="label label-default"
+                            {% if user.is_staff %}
+                                title="Click for more information"
+                                style="cursor: help;"
+                                onclick="alert('Serial No: {{ device_info.serial_no }}');"
+                            {% endif %}
+                        >{{ device_info.platform }}</span>
+                        {{ device_info.make }} {{ device_info.model }}<br>
+                        Screen Resolution: {{ device_info.screen_resolution }}
+                    {% endwith %}
+                </td>
+                {% if session.session_complete %}
+                    <td>
+                      Language: <span class="label label-default">{{ session.language_description }}</span><br>
+                      {% for stat in session.human_readable_stats %}
+                          {{ stat }}<br>
+                      {% endfor %}
+                    </td>
+                    <td>
+                        <p class="small">
+                            Resetting candidate data is an option we provide to allow the candidate to sit the
+                            assessment again, for example, if the candidate is severely distracted while completing the
+                            assessment. <strong>Note</strong>, once you reset a candidate's data, there is no going back.
+                            <a
+                                id="confirmResetGame-{{ game.pk }}"
+                                href="{% url 'programme:players-reset-game' player.programme.pk player.pk game.game_id %}"
+                                class="link-danger"
+                                role="button">Reset
+                            </a>
+                        </p>
+                        {% if not session.scores_calculated %}
+                            <p class="small">
+                                The psychometric profile has not been calculated for this assessment yet. We attempt to
+                                calculate scores automatically; if there is a problem support will be notified.
+
+                            </p>
+                        {% endif %}
+                    </td>
+                {% else %}
+                    <td>Statistics unavailable until assessment completed</td>
+                    <td>Data unavailable until assessment completed</td>
+                {% endif %}
+            </tr>
+          {% endfor %}
+        </tbody>
+    </table>
+    <!-- END GAMES -->
+
+    <!-- PLAYER HISTORY -->
+    <hr>
+    <h3>Candidate History</h3>
+    {% if player.logs.exists %}
+        <div style="height: 400px; overflow: auto; font-size: smaller;">
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Message</th>
+                    <th>Timestamp</th>
+                </tr>
+                </thead>
+                <tbody>
+                    {% for log in player.logs.all %}
+                        <tr>
+                            <td>{{ log.user }}</td>
+                            <td>{{ log.message }}</td>
+                            <td>{{ log.timestamp }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <p>We have no history for this candidate.</p>
+    {% endif %}
+    <!-- END PLAYER HISTORY -->
+
+    {% if request.user.is_staff %}
+        <hr>
+        <h3>Staff Administration <small><span class="label label-info">Arctic Shores Staff</span></small></h3>
+        <p>
+            <a href="{% url 'programme:players-scoring-errors' player.programme.pk player.pk %}">
+                Investigate Scoring Errors
+            </a>
+        </p>
+        <p>Reset individual levels from assessments that candidates have started (there may be no such levels):</p>
+        <ul>
+            {% for session in player.session_set.all %}
+                <li><a href="{% url 'programme:reset-session-level' session.id %}">{{ session.game.name }}</a></li>
+            {% endfor %}
+        </ul>
+
+        {% if request.user.is_superuser %}
+            <p>
+                <a href="{% url 'programme:players-history' player.programme.pk player.pk %}">
+                    View deleted historical records
+                </a>
+            </p>
+        {% endif %}
+    {% endif %}
+</div>
+{% include 'programme/modals/email_preview.html' %}
+{% include 'programme/modals/confirm_send_reminder.html' %}
+{% include 'programme/modals/confirm_reset_game.html' %}
+{% endblock content %}
+
+{% block javascript %}
+    {{ block.super }}
+    <script src="{% static 'js/Chart.min.js' %}?v=1"></script>
+    <script>
+        var settings = function(label) {
+            return {
+                type: 'horizontalBar',
+                data: {
+                    labels: [
+                        {% for score in personality_normed_scores %}
+                            "{{ score.trait.name }}",
+                        {% endfor %}
+                    ],
+                    datasets: [{
+                            label: label,
+                            backgroundColor: "rgba(51,51,51,0.2)",
+                            borderColor: "rgba(0,192,192,0.5)",
+                            hoverBackgroundColor: "rgba(0,192,192,0.5)",
+                            hoverBorderColor: "rgba(51,51,51,0.2)",
+                            borderWidth: 2
+                        }
+                    ]
+                },
+                options: {
+                    responsive: false,
+                    tooltips: {
+                        mode: 'index',
+                        intersect: true
+                    },
+                    legend: {
+                        display: false
+                    },
+                    scales: {
+                        xAxes: [{
+                            scaleLabel: {
+                                display: true,
+                                labelString: label
+                            }
+                        }]
+                    }
+                }
+            };
+        };
+
+        {% if personality_normed_scores %}
+            /* Sten Chart */
+            var stenSettings = settings("Sten");
+            stenSettings.data.datasets[0].data = [
+                {% for score in personality_normed_scores %}
+                    {{ score.sten }},
+                {% endfor %}
+            ];
+            stenSettings.options.scales.xAxes[0].ticks = {
+                min: 0,
+                max: 10,
+                stepSize: 1
+            };
+            new Chart(document.getElementById("graphStens").getContext("2d"), stenSettings);
+
+            /* Normalised Score Chart */
+            var normalisedScoreSettings = settings("Standard Deviation");
+            normalisedScoreSettings.data.datasets[0].data = [
+                {% for score in personality_normed_scores %}
+                    {{ score.zscore_rounded }},
+                {% endfor %}
+            ]
+            normalisedScoreSettings.options.scales.xAxes[0].ticks = {
+                min: -3.5,
+                max: 3.5,
+                stepSize: 0.5
+            };
+            new Chart(document.getElementById("graphNormalisedScores").getContext("2d"),
+                normalisedScoreSettings);
+        {% endif %}
+
+        {% if riasec_profile %}
+            /* RIASEC Score Chart */
+            var zScores = [{{ riasec_profile.score_iterator|join:"," }}]
+            var riasecScoreSettings = {
+                type: 'radar',
+                data: {
+                    labels: ["{{ riasec_profile.LABELS|join:'","' }}"],
+                    datasets: [{
+                        label: 'z-score',
+                        backgroundColor: "rgba(51,51,51,0.2)",
+                        borderColor: "rgba(0,192,192,0.5)",
+                        hoverBackgroundColor: "rgba(0,192,192,0.5)",
+                        hoverBorderColor: "rgba(51,51,51,0.2)",
+                        borderWidth: 2,
+                        data: zScores
+                    }]
+                },
+                options: {
+                    responsive: false,
+                    legend: {
+                        display: false,
+                    },
+                    scale: {
+                        ticks: {
+                            // Push the lowest value away from the centre
+                            min: Math.max(Math.min.apply(Math, zScores) - 0.25, -3.5),
+                            display: false
+                        }
+                    }
+                }
+            };
+            new Chart(document.getElementById("graphRIASEC").getContext("2d"), riasecScoreSettings);
+        {% endif %}
+    </script>
+    <script type="text/javascript">
+        /* Player note */
+        $('#toggle-player-note-form').click(function(event) {
+            $('.player-note-content').toggle();
+            $('.player-note-form-container').toggle();
+        });
+
+        $('#id-dismiss-note-form-button').click(function(event) {
+            $('.player-note-content').toggle();
+            $('.player-note-form-container').toggle();
+        });
+
+        $(document).ready(function() {
+
+            $('.tab-pane#stens').addClass('active');
+            $('[id^=confirmResetGame-]').click(function(event) {
+                event.preventDefault();
+                var game_id = $(this).prop("id").split("-")[1];
+                var game_name = $("#" + game_id + " #game").text().trim();
+                var href = $(this).attr('href');
+                var modalText = "This action <strong>CANNOT</strong> be undone. This will permanently delete this candidate's data for the assessment <strong>" + game_name + "</strong>";
+                showModal('#confirmResetGameModal', modalText, function(event) {
+                    event.preventDefault();
+                    var resetGameForm = $('#resetGameForm');
+                    resetGameForm.attr('action', href);
+                    resetGameForm.submit();
+                });
+            });
+
+            $('.sendReminder').click(function(event) {
+                event.preventDefault();
+                var href = $(this).attr('href');
+                showModal('#confirmSendReminderModal', function() {
+                    $('#confirmSendReminderModal #confirm-yes').attr('action', href);
+                    if(href.endsWith('self=1')) {
+                        $('#confirmSendReminderModal input[name=self]').attr('value', 1);
+                    } else {
+                        $('#confirmSendReminderModal input[name=self]').attr('value', 0);
+                    }
+                });
+            });
+
+            /* Player star */
+            $("a.star").click(toggleStar);
+        });
+    </script>
+{% endblock javascript %}

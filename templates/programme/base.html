@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block breadcrumbs %}
+    {% if request.user.is_staff or request.user.is_reseller %}
+        {% if programme %}
+            {{ programme.company.name }} &raquo;
+        {% endif %}
+    {% endif %}
+    <a href="{% url 'programme:index' %}">All programmes</a>
+{% endblock breadcrumbs %}
+
+{% block programme %}{% endblock programme %}

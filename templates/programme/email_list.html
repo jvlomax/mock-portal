@@ -1,0 +1,81 @@
+{% extends 'programme/base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Email list" %}{% endblock title %}
+{% block nav %}{% with section="programmes" %}{{ block.super }}{% endwith %}{% endblock nav %}
+
+{% block breadcrumbs %}
+    {{ block.super }} &raquo; <a href="{% url 'programme:detail' programme.id %}">{{ programme.name }}</a> &raquo; Programme emails
+{% endblock breadcrumbs %}
+
+{% block programme %}
+    {{ block.super }}
+    <h3>Emails</h3>
+{% endblock programme %}
+
+{% block content %}
+<div class="row">
+	<div class="col-xs-12">
+		{% for email in email_list %}
+			<a href="#{{ email.slug }}">{{ email.get_email_type_display }}</a>
+			<br>
+		{% endfor %}
+	</div>
+</div>
+{% if programme.self_registration_scheme %}
+<br>
+<p class="small">
+        * Please note that this programme is accessible via player self-registration "{{ programme.self_registration_scheme }}"
+        therefore the invitation email and report email may also be displayed to users online.
+</p>
+{% endif %}
+<div class="row">
+	<div class="col-xs-12">
+	{% for email in email_list %}
+		<a name="{{ email.slug }}"></a>
+		<hr>
+		<div class="row">
+			<div class="col-xs-12">
+			    <h4>{{ email.get_email_type_display }}</h4>
+			    <a href="{% url 'programme:email-preview' programme.pk email.slug %}">Email me a preview</a>
+			</div>
+		</div>
+		<br>
+	    <div class="row">
+	        <div class="col-sm-1"></div>
+	        <div class="col-sm-10">
+	            <div class="panel panel-default">
+	                <div class="panel-body">
+	                    <div class="row">
+	                        <div class="col-xs-9">
+	                            <strong>From:</strong> {{ email.from_email }}<br>
+	                            <strong>To:</strong> <em>&lt;recipient&gt;</em><br>
+	                            <strong>Subject:</strong> {{ email.subject }}
+	                        </div>
+                            <div class="col-xs-2">
+                                {% if email.pk %}
+                                    {# Default emails are generated, not stored in DB, so if the email has a pk it must not be default #}
+                                    <em><small>This email has been customised</small></em> <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+                                {% else %}
+                                    <em><small>This email has not been customised</small></em> <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                                {% endif %}
+                            </div>
+	                        <div class="col-xs-1">
+                                <a href="{% url 'programme:update-email' programme.id email.slug %}" class="link" role="button">
+                                    <span class="glyphicon glyphicon-edit" aria-hidden="true">Edit</span>
+                                </a>
+	                        </div>
+	                    </div>
+	                    <hr>
+                        <div class="email-body">
+	                        {{ email.body|safe }}
+                        </div>
+	                </div>
+	            </div>
+	        </div>
+	        <div class="col-sm-1"></div>
+	    </div>
+	{% endfor %}
+	</div>
+</div>
+{% endblock content %}

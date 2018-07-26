@@ -1,0 +1,21 @@
+{% extends "base-mobile.html" %}
+{% load i18n crispy_forms_tags %}
+
+{% block content %}
+    {% if progress_value %}<progress max="{{ progress_max }}" value="{{ progress_value }}"></progress>{% endif %}
+    <h4>Composite Questionnaire{% if wizard.steps.step1 > 1 %} (continued){% endif %}</h4>
+    <div class="heading">
+      {% if wizard.steps.step1 == 1 %}
+          This questionnaire should take about 10 minutes to complete. Please read each statement carefully then select how accurately the statement describes you.
+      {% endif %}
+    </div>
+    {% if form.errors %}
+        <p class="errors">
+            ** Please correct the errors below **
+        </p>
+    {% endif %}
+    <form method="post">
+        {{ wizard.management_form }}
+        {% crispy form %}
+    </form>
+{% endblock content %}

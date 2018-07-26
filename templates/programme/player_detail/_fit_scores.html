@@ -1,0 +1,121 @@
+{% comment %}
+    Fit scores sub-section for player detail screen.
+
+    Takes in:
+        - request
+        - player: metrics.Player instance
+{% endcomment %}
+
+<hr />
+<h3>Fit Scores</h3>
+<p>
+    The suitability of the candidate against your organisation's competency requirements. The Fit Score is normalised, which means that candidates have been ranked for their fit against a relevant comparison norm group. A fit score of 75 means the candidate scored in the 75th percentile. This indicates that the candidate is a better fit for your organisation than 75% of the norm group.
+</p>
+
+{% with are_profiles_setup=player.programme.roles.exists %}
+{% if are_profiles_setup %}
+
+        {% if not player.check_games_complete %}
+
+            {# No data - display placeholder graphs #}
+
+            <div class="row player-detail-score">
+
+                {% if personality_roles %}
+                    <div class="col-md-{% if aptitude_roles %}8{% else %}12{% endif %}">
+                        <h4 class="player-detail-score__title">Profile Fit Score{{ personality_roles.count|pluralize }}</h4>
+
+                        {% for profile in personality_roles %}
+                            {% include "programme/graphs/_doughnut_graph.html" with score=0 caption=profile.name centre="N/A" only %}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                {% if aptitude_roles %}
+                    <div class="col-md-{% if personality_roles %}4{% else %}12{% endif %}">
+                        <h4 class="player-detail-score__title">Aptitude Sift Score</h4>
+
+                        {% for profile in aptitude_roles %}
+                            {% include "programme/graphs/_doughnut_graph.html" with score=0 caption=profile.name centre="N/A" only %}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+            </div>
+        {% else %}
+
+            <div class="row player-detail-score">
+
+                {% if personality_roles and personality_fitscores %}
+                    <div class="col-md-{% if aptitude_roles and aptitude_fitscores %}8{% else %}12{% endif %}">
+
+                        <h4 class="player-detail-score__title">Profile Fit Score{{ personality_fitscores.count|pluralize }}</h4>
+
+                        {% for fit_score in personality_fitscores %}
+                            <div class="doughnut-figure">
+                                {% include "programme/graphs/_doughnut_graph.html" with score=fit_score.score caption=fit_score.role.name only %}
+                                <br><br>
+
+                                    <a href="{% url 'reporting:download-fit-manager-report' player.player_id fit_score.id %}" class="btn btn-xs"
+                                    {# visibility:hidden is a hack to force all the fit doughnuts to line up #}
+                                    {% if fit_score.role_id not in roles_to_report_on %}style="visibility:hidden" {% endif %}
+                                    >
+                                        <span class="glyphicon glyphicon-save"></span> Download fit report
+                                    </a>
+                            </div>
+                        {% endfor %}
+
+                    </div>
+                {% endif %}
+
+                {% if aptitude_roles and aptitude_fitscores %}
+                    <div class="col-md-{% if personality_roles and personality_fitscores %}4{% else %}12{% endif %}">
+                        <h4 class="player-detail-score__title">Aptitude Sift Score</h4>
+
+                        {% for fit_score in aptitude_fitscores %}
+                            <div class="doughnut-figure">
+                                {% include "programme/graphs/_doughnut_graph.html" with score=fit_score.score caption=fit_score.role.name only %}
+                                <br><br>
+                                    {# visibility:hidden is a hack to force all the fit doughnuts to line up #}
+                                    <a href="{% url 'reporting:download-fit-manager-report' player.player_id fit_score.id %}" class="btn btn-xs"
+                                    {% if fit_score.role_id not in roles_to_report_on %}style="visibility:hidden" {% endif %}
+                                    >
+                                        <span class="glyphicon glyphicon-save"></span> Download fit report
+                                    </a>
+                            </div>
+                        {% endfor %}
+
+                    </div>
+                {% endif %}
+            </div>
+
+        {% endif %}
+
+    {# Init. doughnut graphs #}
+    <script>
+        var elements = document.getElementsByClassName('doughnut-figure__graph');
+        var attrs = {
+            barColor: "#00c0c0",
+            lineWidth: 12,
+            lineCap: "square",
+            trackColor: "#eee",
+            scaleColor: "#ddd",
+            size: 160,
+        };
+        for (var i = 0; i < elements.length; i++) {
+            new EasyPieChart(elements[i], attrs);
+        }
+    </script>
+{% else %}
+    {% if player.scores_calculated %}
+        <p>No Fit Profiles have been assigned to this programme. General data is available in the report below.</p>
+        <div class="btn-group">
+            <a href="{% url 'reporting:download-manager-report' player.player_id %}" class="btn btn-xs">
+                <span class="glyphicon glyphicon-save"></span> Download manager report
+            </a>
+        </div>
+    {% else %}
+        <p>No Fit Profiles have been assigned to this programme.</p>
+    {% endif %}
+{% endif %}
+{% endwith %}

@@ -1,0 +1,44 @@
+{% extends "programme/base.html" %}
+{% load i18n crispy_forms_tags %}
+
+{% block title %}{% trans "Edit invitation email for programme " %} {{ email.programme.name }}{% endblock title %}
+
+{% block nav %}{% with section="programmes" %}{{ block.super }}{% endwith %}{% endblock nav %}
+
+{% block breadcrumbs %}
+    {{ block.super }} &raquo; <a href="{% url 'programme:detail' programme.id %}">{{ programme.name }}</a> &raquo; <a href="{% url 'programme:email-list' programme.id %}">Programme emails</a> &raquo; Edit {{ email.get_email_type_display }} email
+
+{% endblock breadcrumbs %}
+
+{% block programme %}
+    {{ block.super }}
+    <h3>Edit email</h3>
+{% endblock programme %}
+
+{% block content %}
+<div class="row">
+    <div class="col-xs-12">
+        <h3><small>{{ email.get_email_type_display }}</small><h3>
+    </div>
+</div>
+<div>
+    The following substitutions are available in the subject and body of the email:
+    <ul>
+        <li><strong>{% verbatim %}{{ player_key }}{% endverbatim %}</strong> the player's unique player key.</li>
+        <li><strong>{% verbatim %}{{ first_name }}{% endverbatim %}</strong> the player's first name.</li>
+        <li><strong>{% verbatim %}{{ last_name }}{% endverbatim %}</strong> the player's last name.</li>
+        <li><strong>{% verbatim %}{{ client_supplied_id }}{% endverbatim %}</strong> the player's client supplied id.</li>
+        <li><strong>{% verbatim %}{{ support_email_address }}{% endverbatim %}</strong> the reseller's default support email.
+    </ul>
+</div>
+<hr>
+{% crispy form %}
+{% endblock content %}
+
+{% block javascript %}
+{{ block.super }}
+    <script src="//cdn.ckeditor.com/4.4.6/full/ckeditor.js"></script>
+    <script>
+        CKEDITOR.replace('id_body')
+    </script>
+{% endblock javascript %}

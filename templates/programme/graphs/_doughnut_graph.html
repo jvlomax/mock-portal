@@ -1,0 +1,24 @@
+{% comment %}
+    Doughnut graph with an optional caption.
+    Initialise with EasyPieChart.
+
+    Takes in:
+        - score (integer) - percentage
+        - caption (optional string)
+        - centre (optional string) - override displaying score in the centre
+{% endcomment %}
+
+<div class="doughnut-figure">
+    <div class="doughnut-figure__graph" data-percent="{{ score }}">
+        <span class="doughnut-figure__value">
+            {% if centre %}
+                {{ centre }}
+            {% else %}
+                {{ score }}
+            {% endif %}
+            </span>
+    </div>
+    {% if caption %}
+        <span class="doughnut-figure__name">{{ caption }}</span>
+    {% endif %}
+</div>

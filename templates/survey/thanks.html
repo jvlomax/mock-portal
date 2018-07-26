@@ -1,0 +1,40 @@
+{% extends "base-mobile.html" %}
+{% load staticfiles i18n %}
+{% block content %}
+    <h4>{% trans "Thank you" %}</h4>
+    <div class="heading">
+        {% blocktrans trimmed with link='href="mailto:support@arcticshores.com"'%}
+            Thank you for taking part! Should you wish to get in touch with us to discuss our game or to withdraw
+            your data, you can contact us at <a {{link}}>support@arcticshores.com</a>.
+        {% endblocktrans %}
+    </div>
+    <div class="signoff">
+        {% trans "The Arctic Shores Team" %}
+    </div>
+    <br>
+    <br>
+    <div>
+    {% if player.survey_outgoing_url %}
+        <fieldset style="text-align: center;">
+            {% if prolific_academic %}
+                <img src="{% static 'images/prolific-academic-logo-small.png' %}" class="logo">
+                    If you've completed this survey for a Prolific Academic study, please enter your Prolific ID:
+                    <form method="POST">
+                        {% csrf_token %}
+                        {% with field=form.client_supplied_id %}
+                            <div id="{{ field.auto_id }}_container" class="field_container">
+                              <div id="{{ field.auto_id }}_errors">{{ field.errors }}</div>
+                              <div>{{ field }}</div>
+                            </div>
+                        {% endwith %}
+                        <input type="submit">
+                    </form>
+            {% else %}
+                <a href="{{ player.survey_outgoing_url }}">Please click here to leave our site and continue to the next step.</a>
+            {% endif %}
+        </fieldset>
+    {% endif %}
+    </div>
+    <br>
+
+{% endblock content %}

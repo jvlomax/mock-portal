@@ -1,0 +1,22 @@
+{% extends "programme/base.html" %}
+{% load i18n crispy_forms_tags %}
+
+{% block title %}{% trans "Export candidates" %}{% endblock title %}
+
+{% block nav %}{% with section="programmes" %}{{ block.super }}{% endwith %}{% endblock nav %}
+
+{% block breadcrumbs %}
+    {{ block.super }}
+    &raquo; <a href="{% url 'programme:detail' programme.id %}">{{ programme.name }}</a>
+    &raquo; Export candidates
+{% endblock breadcrumbs %}
+
+{% block programme %}
+	{{ block.super }}
+	<h3>Export Candidates</h3>
+	<br>
+{% endblock programme %}
+
+{% block content %}
+	{% crispy form %}
+{% endblock content %}

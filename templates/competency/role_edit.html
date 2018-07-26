@@ -1,0 +1,509 @@
+{% extends "base.html" %}
+
+{% block title %}Role Edit{% endblock %}
+
+{% block nav %}{% with section="roles" %}{{ block.super }}{% endwith %}{% endblock nav %}
+
+{% block breadcrumbs %}
+    <a href="{% url 'programme:detail' programme_id=programme.id %}">{{ programme.name }}</a> &raquo;
+    {% if is_new_profile %}
+        <a href="">Add new {{ sifting|yesno:"Sift,Fit" }} Profile</a>
+    {% else %}
+        <a href="">Edit {{ form.instance.name }} {{ sifting|yesno:"Sift,Fit" }} Profile</a>
+    {% endif %}
+{% endblock %}
+
+{% block css %}
+    <style>
+        {% include "competency/includes/_edit.css" %}
+
+        .role {
+            margin-bottom: 10px;
+            border: solid #EDF2F2 1px;
+            width: 100%;
+            padding: 10px;
+            padding-bottom: 0;
+            background-color: #F8F9F9;
+        }
+
+        #id_name {
+            width: 100%;
+        }
+
+        #id_description {
+            width: 100%;
+            height: 100px;
+        }
+
+        .aptitude__bar-block { display: inline-block; height: 16px; }
+        .aptitude__label { position: absolute; font-style: normal; font-size: 0.9em; }
+
+    </style>
+
+    {{ block.super }}
+{% endblock %}
+
+{% block content %}
+    <h3><small>{{ programme.name }}</small></h3>
+    <h2>
+        {% if is_new_profile %}
+            Add {{ sifting|yesno:"Sift,Fit" }} Profile
+        {% else %}
+            Edit {{ sifting|yesno:"Sift,Fit" }} Profile
+        {% endif %}
+    </h2>
+    <p>
+        <span class="label label-info">Editable by Arctic Shores Staff Only</span>
+    </p>
+    <form id="edit-form" action="" method="POST">
+        {% if form.errors or formset.errors %}
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="alert alert-danger">
+                        <p>Please correct errors below. Your changes have not yet been saved.</p>
+                    </div>
+                    {% if form.non_field_errors %}
+                        <ul>
+                            {% for error in form.non_field_errors %}
+                                <li style="color:#a94442;">{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
+
+        {% csrf_token %}
+        <div class="role">
+            {% for field in form.visible_fields %}
+                <div class="row">
+                    <div class="col-xs-12 col-sm-9 col-md-6">
+                        <div><strong>{{ field.label }}: </strong></div>
+                        {% if field.errors %}
+                            <span style="color:#a94442;">
+                                {{ field.errors }}
+                            </span>
+                        {% endif %}
+                        <div>{{ field }}</div>
+                    </div>
+                </div>
+                <br>
+            {% endfor %}
+            {% for field in form.hidden_fields %}
+                {{ field }}
+            {% endfor %}
+        </div>
+
+        {% if unmeasurable_info %}
+            <div class="panel-group">
+                <div class="panel panel-default">
+                    <div class="panel-heading" role="button" data-toggle="collapse" href="#collapse1">
+                        <div class="panel-title">
+                            <span class="glyphicon glyphicon-sort-by-attributes" aria-hidden="true"></span>
+                            &nbsp;
+                            View traits that require additional levels in order to measure them
+                            <span class="badge">{{ unmeasurable_info|length }}</span>
+                        </div>
+                    </div>
+                    <div id="collapse1" class="panel-collapse collapse">
+                        <table class="table table-striped table-hover table-condensed">
+                            {% for unmeasurable_trait, levels_required_str in unmeasurable_info %}
+                                <tr>
+                                    <td style="white-space: nowrap;">{{ unmeasurable_trait }}</td>
+                                    <td width="100%">{{ levels_required_str }}</td>
+                                </tr>
+                            {% endfor %}
+                        </table>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
+        {# Role Trait Contribution form container #}
+        <fieldset class="form-container">
+            <legend>
+                {% if not sifting %}
+                    Personality Traits and Cognitive Abilities
+                {% else %}
+                    Aptitudes
+                {% endif %}
+            </legend>
+            <p>
+                {% if not sifting %}
+                    Adjust the contributions from personality traits and cognitive abilities to
+                    the Fit Score.
+                {% else %}
+                    Adjust the requirements for candidates to meet for this Sift Profile by selecting
+                    the Aptitude Cut-offs.
+                {% endif %}
+            </p>
+
+            {% if formset.non_form_errors %}
+                <div class="row">
+                    <div class="col-md-6">
+                        <span style="color:#a94442;">
+                            {{ formset.non_form_errors }}
+                        </span>
+                    </div>
+                </div>
+            {% endif %}
+            {{ formset.management_form }}
+
+            <div class="formset-container">
+                {% for form in formset %}
+                    <div class="trait">
+                        {% if form.errors %}
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <span style="color:#a94442;">
+                                        {% for field in form %}
+                                            {% if field.errors %}
+                                                {{ field.label_tag }} {{ field.errors }}
+                                            {% endif %}
+                                        {% endfor %}
+                                        {% for error in form.non_field_errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </span>
+                                </div>
+                            </div>
+                        {% endif %}
+                        {{ form.id }}
+                        <div class="row">
+                            <div class="col-md-6">
+                                <strong>{{ sifting|yesno:"Aptitude,Trait" }}: </strong>{{ form.trait }}
+                                {{ form.DELETE.as_hidden }}
+                                <a class="remove" href="#">
+                                    <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Remove
+                                </a>
+                            </div>
+                        </div>
+                        <br>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <strong>Weighting: </strong>
+                                <span>{% if form.weighting.value %}{{ form.weighting.value }}{% else %}50{% endif %}</span>%
+                                <span class="weighting">{{ form.weighting }}</span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <strong>{{ sifting|yesno:"Aptitude Cut-off,Ideal Range" }}:</strong>
+                                <div id="ideal_range_threshold_1">{{ form.ideal_range_threshold_1.as_hidden }}</div>
+                                <div id="ideal_range_threshold_2">{{ form.ideal_range_threshold_2.as_hidden }}</div>
+                                {% if not sifting %}
+                                    <div class="slide"></div>
+                                {% else %}
+                                    <!-- **** START APTITUDE SLIDER **** -->
+                                    {{ form.aptitude_cutoff }}
+                                    <div class="aptitude-graph" style="width: 250px; margin-left: 50px; margin-bottom: 8px; position: relative;">
+                                        <div class="trait-{{ trait.id }}-graph" style="position: relative; width: 250px;">
+                                            <div style="position: relative; overflow: hidden; height: 16px;">
+                                                <div class="aptitude__bar-block bar-first red-bg" style="width: 80px; "></div>
+                                                <div class="aptitude__bar-block bar-second green-bg" style="width: 80px;"></div>
+                                                <div class="aptitude__bar-block bar-third green-bg" style="width: 80px;"></div>
+                                            </div>
+                                            <div style="position: relative; height: 1em; margin-top: 0.4em">
+                                              <span class="aptitude__label" style="left: -05px">percentile</span>
+                                              <span class="aptitude__label" style="left: 065px;">30th</span>
+                                              <span class="aptitude__label" style="left: 145px;">50th</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- **** END APTITUDE SLIDER **** -->
+                                {% endif %}
+                                {# These inputs must be after for <reasons> #}
+                                <div id="ideal_range_threshold_3">{{ form.ideal_range_threshold_3.as_hidden }}</div>
+                                <div id="ideal_range_threshold_4">{{ form.ideal_range_threshold_4.as_hidden }}</div>
+                            </div>
+                        </div>
+                        {% if not sifting %}
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <div class="steps">
+                                        <span class="tick" style="left: 10%">1</span>
+                                        <span class="tick" style="left: 20%">2</span>
+                                        <span class="tick" style="left: 30%">3</span>
+                                        <span class="tick" style="left: 40%">4</span>
+                                        <span class="tick" style="left: 50%">5</span>
+                                        <span class="tick" style="left: 60%">6</span>
+                                        <span class="tick" style="left: 70%">7</span>
+                                        <span class="tick" style="left: 80%">8</span>
+                                        <span class="tick" style="left: 90%">9</span>
+                                        <span class="tick" style="left: 100%">10</span>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+            <input type="button" value="Add {{ sifting|yesno:'Aptitude,Trait' }}" class="add-trait" data-template="#trait-template">
+        </fieldset>
+
+        {# Fit with Aptitude traits #}
+        {% if not sifting %}
+            <br>
+            <fieldset class="form-container">
+                <legend>Aptitudes</legend>
+                <p>
+                    Include Aptitude(s) within Fit Profiles to contribute to the Fit Score
+                    (rather than being used to Sift candidates).
+                </p>
+                {% if fit_aptitude_formset %}
+                    {% if fit_aptitude_formset.non_form_errors %}
+                        <div class="row">
+                            <div class="col-md-6">
+                                <span style="color:#a94442;">
+                                    {{ fit_aptitude_formset.non_form_errors }}
+                                </span>
+                            </div>
+                        </div>
+                    {% endif %}
+                    {{ fit_aptitude_formset.management_form }}
+
+                    <div class="formset-container">
+                        {% for form in fit_aptitude_formset %}
+                            <div class="trait">
+                                {% if form.errors %}
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <span style="color:#a94442;">
+                                                {% for field in form %}
+                                                    {% if field.errors %}
+                                                        {{ field.label_tag }} {{ field.errors }}
+                                                    {% endif %}
+                                                {% endfor %}
+                                                {% for error in form.non_field_errors %}
+                                                    {{ error }}
+                                                {% endfor %}
+                                            </span>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                                {{ form.id }}
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <strong>Aptitude: </strong>{{ form.trait }}
+                                        {{ form.DELETE.as_hidden }}
+                                        <a class="remove" href="#">
+                                            <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Remove
+                                        </a>
+                                    </div>
+                                </div>
+                                <br>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <strong>Weighting: </strong>
+                                        <span>{% if form.weighting.value %}{{ form.weighting.value }}{% else %}50{% endif %}</span>%
+                                        <span class="weighting">{{ form.weighting }}</span>
+                                    </div>
+                                </div>
+
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <strong>Scoring</strong>
+                                        <p>
+                                            A candidate's fit for this aptitude will improve linearly from the 0th to the 50th
+                                            percentile, after which they will have the maximum (best) fit and they will
+                                            equally good as anyone else.
+                                        </p>
+                                        <!-- **** START APTITUDE SLIDER **** -->
+                                        <div class="aptitude-graph" style="width: 250px; margin-left: 50px; margin-bottom: 8px; position: relative;">
+                                            <div style="position: relative; width: 250px;">
+                                                <div style="position: relative; overflow: hidden; height: 16px;">
+                                                    <div class="aptitude__bar-block bar-first yellow-to-red-bg" style="width: 160px;"></div>
+                                                    <div class="aptitude__bar-block bar-third green-bg" style="width: 80px;"></div>
+                                                </div>
+                                                <div style="position: relative; height: 1em; margin-top: 0.4em">
+                                                  <span class="aptitude__label" style="left: -05px">percentile</span>
+                                                  <span class="aptitude__label" style="left: 145px;">50th</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- **** END APTITUDE SLIDER **** -->
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <input type="button" value="Add Aptitude" class="add-trait" data-template="#trait-template-fit-aptitude">
+                {% else %}
+                    <p class="alert alert-info">
+                    {% if programme.has_sift_profile %}
+                        Aptitude(s) cannot be included while a Sift Profile is in use.
+                        Please remove the Sift Profile to use a Fit Profile with Aptitude(s).
+                    {% elif not programme.has_game_measuring_personality_and_aptitude %}
+                        Aptitude(s) can only be included if the programme is using a single assessment that measures
+                        aptitudes and personality traits.
+                    {% else %}
+                        <!-- We cannot be sure why this programme is not supporting aptitude traits at this stage.
+                             See Programme.supports_aptitude_fit -->
+                        Aptitude(s) cannot currently be supported by this programme.
+                    {% endif %}
+                    </p>
+                {% endif %}
+            </fieldset>
+        {% endif %}
+
+        <hr>
+        <a id="confirm-role-change" href="javascript: void(0)" class="btn">Save</a>
+        <a id="cancel-role-change" href="javascript: void(0)" class="btn">Cancel</a>
+        {% if not is_new_profile %}
+            <a id='confirm-role-delete' href="javascript: void(0)" class="btn btn-danger">
+                <span class="glyphicon glyphicon-trash"></span>
+                Delete
+            </a>
+        {% endif %}
+    </form>
+
+    <br>
+    {% include "competency/modals/confirm_role_cancel.html" with programme_id=programme.id only %}
+
+    {% include "competency/modals/confirm_role_edit.html" %}
+
+    {% if not is_new_profile %}  {# Modal must be outside above form #}
+        {% include "competency/modals/confirm_role_delete.html" with csrf_token=csrf_token role_id=form.instance.id only %}
+    {% endif %}
+
+{% endblock %}
+
+{% block javascript %}
+    {{ block.super }}
+
+    <script type="text/html" id="trait-template">
+        <div class="trait">
+            <div class="row">
+                <div class="col-md-6">
+                    <strong>{{ sifting|yesno:"Aptitude,Trait" }}:</strong>{{ formset.empty_form.trait }}
+                    {{ formset.empty_form.DELETE.as_hidden }}
+                    <a class="remove" href="#">
+                        <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Remove
+                    </a>
+                </div>
+            </div>
+            <br>
+            <div class="row">
+                <div class="col-md-6">
+                    <strong>Weighting: </strong><span>50</span>%
+                    <span class="weighting">{{ formset.empty_form.weighting }}</span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <strong>{{ sifting|yesno:"Aptitude Cut-off,Ideal Range" }}:</strong>
+                    <div id="ideal_range_threshold_1">{{ formset.empty_form.ideal_range_threshold_1.as_hidden }}</div>
+                    <div id="ideal_range_threshold_2">{{ formset.empty_form.ideal_range_threshold_2.as_hidden }}</div>
+                    {% if not sifting %}
+                        <div class="slide"></div>
+                    {% else %}
+                        <!-- **** START APTITUDE SLIDER **** -->
+                        {{ formset.empty_form.aptitude_cutoff }}
+                        <div class="aptitude-graph" style="width: 250px; margin-left: 50px; margin-bottom: 8px; position: relative;">
+                            <div class="trait-{{ trait.id }}-graph" style="position: relative; width: 250px;">
+                                <div style="position: relative; overflow: hidden; height: 16px;">
+                                    <div class="aptitude__bar-block bar-first red-bg" style="width: 80px; "></div>
+                                    <div class="aptitude__bar-block bar-second green-bg" style="width: 80px;"></div>
+                                    <div class="aptitude__bar-block bar-third green-bg" style="width: 80px;"></div>
+                                </div>
+                                <div style="position: relative; height: 1em; margin-top: 0.4em">
+                                  <span class="aptitude__label" style="left: -05px">percentile</span>
+                                  <span class="aptitude__label" style="left: 065px;">30th</span>
+                                  <span class="aptitude__label" style="left: 145px;">50th</span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- **** END APTITUDE SLIDER **** -->
+                    {% endif %}
+                    <div id="ideal_range_threshold_3">{{ formset.empty_form.ideal_range_threshold_3.as_hidden }}</div>
+                    <div id="ideal_range_threshold_4">{{ formset.empty_form.ideal_range_threshold_4.as_hidden }}</div>
+                </div>
+            </div>
+            {% if not sifting %}
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="steps">
+                            <span class="tick" style="left: 10%">1</span>
+                            <span class="tick" style="left: 20%">2</span>
+                            <span class="tick" style="left: 30%">3</span>
+                            <span class="tick" style="left: 40%">4</span>
+                            <span class="tick" style="left: 50%">5</span>
+                            <span class="tick" style="left: 60%">6</span>
+                            <span class="tick" style="left: 70%">7</span>
+                            <span class="tick" style="left: 80%">8</span>
+                            <span class="tick" style="left: 90%">9</span>
+                            <span class="tick" style="left: 100%">10</span>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </script>
+
+    <script type="text/html" id="trait-template-fit-aptitude">
+        <div class="trait">
+            <div class="row">
+            <div class="row">
+                <div class="col-md-6">
+                    <strong>Aptitude: </strong>{{ fit_aptitude_formset.empty_form.trait }}
+                    {{ fit_aptitude_formset.empty_form.DELETE.as_hidden }}
+                    <a class="remove" href="#">
+                        <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Remove
+                    </a>
+                </div>
+            </div>
+            <br>
+            <div class="row">
+                <div class="col-md-6">
+                    <strong>Weighting: </strong><span>50</span>%
+                    <span class="weighting">{{ fit_aptitude_formset.empty_form.weighting }}</span>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <strong>Scoring</strong>
+                    <p>
+                        A candidate's fit for this aptitude will improve linearly from the 0th to the 50th
+                        percentile, after which they will have the maximum (best) fit and they will
+                        equally good as anyone else.
+                    </p>
+                    <!-- **** START APTITUDE SLIDER **** -->
+                    <div class="aptitude-graph" style="width: 250px; margin-left: 50px; margin-bottom: 8px; position: relative;">
+                        <div style="position: relative; width: 250px;">
+                            <div style="position: relative; overflow: hidden; height: 16px;">
+                                <div class="aptitude__bar-block bar-first yellow-to-red-bg" style="width: 160px;"></div>
+                                <div class="aptitude__bar-block bar-third green-bg" style="width: 80px;"></div>
+                            </div>
+                            <div style="position: relative; height: 1em; margin-top: 0.4em">
+                              <span class="aptitude__label" style="left: -05px">percentile</span>
+                              <span class="aptitude__label" style="left: 145px;">50th</span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- **** END APTITUDE SLIDER **** -->
+                </div>
+            </div>
+        </div>
+    </script>
+
+    <script type="text/javascript">
+        {% include "competency/includes/_edit.js" %}
+
+        /* Confirm cancelling role change modal */
+        $("[id=cancel-role-change]").click(function(event) {
+            event.preventDefault();
+            showModal('#confirmCancelChange');
+        });
+        $("[id=confirm-role-change]").click(function(event) {
+            event.preventDefault();
+            showModal('#confirmEdit');
+        });
+        $("[id=confirm-role-delete]").click(function(event) {
+            event.preventDefault();
+            showModal('#confirmDeleteModal');
+        });
+    </script>
+
+{% endblock %}

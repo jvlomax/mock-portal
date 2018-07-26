@@ -1,0 +1,23 @@
+{% extends "competency/modals/extend/confirm_edit.html" %}
+
+{% block title %}
+    {% if is_new_profile %}
+        Confirm new Fit Profile
+    {% else %}
+        Confirm changing the Fit Profile
+    {% endif %}
+{% endblock %}
+
+{% block body %}
+    <p>
+        {% if is_new_profile %}
+            It will take a short period of time for the Fit Scores to be calculated for any
+            candidates that have already completed the game-based assessment in this programme. Any
+            candidates completing the assessment later will have their scores calculated automatically.
+        {% else %}
+            Altering this Fit Profile will re-calculate the Fit Scores for all candidates who have
+            completed the game-based assessment in this programme in the background. The new scores will
+            take a short period of time to appear on the DataHub.
+        {% endif %}
+    </p>
+{% endblock %}

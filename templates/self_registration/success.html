@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% load staticfiles i18n %}
+{% block title %} {% trans "Success" context "Title of page for successful registration" %} {% endblock %}
+{% block nav %}
+<nav class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+            <a class="navbar-brand">
+                <img alt="Arctic Shores" src="{% static 'images/arctic-shores-logo.png' %}" width="172">
+            </a>
+        </div>
+    </div>
+</nav>
+{% endblock nav %}
+
+{% block content %}
+<h3>{% trans "Thank you for registering." %}</h3>
+    {{ body }}
+{% endblock %}

@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block title %}Reports{% endblock title %}
+
+{% block nav %}{% with section="reports" %}{{ block.super }}{% endwith %}{% endblock nav %}
+
+{% block breadcrumbs %}
+    <a href="{% url 'reporting:index' %}">All reports</a>
+    {% if report %}
+        &raquo; {{ report.name }}
+    {% endif %}
+{% endblock breadcrumbs %}

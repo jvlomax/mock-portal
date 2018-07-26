@@ -1,0 +1,227 @@
+{% extends "programme/base.html" %}
+{% load i18n django_tables2 %}
+
+{% block title %}{% trans "Programmes" %}{% endblock title %}
+
+{% block nav %}{% with section="programmes" %}{{ block.super }}{% endwith %}{% endblock nav %}
+
+{% block breadcrumbs %}{% endblock breadcrumbs %}
+
+{% block programme %}
+<div class="row">
+    <div class="col-xs-12">
+        <h3>
+            Programmes
+        </h3>
+        <hr>
+    </div>
+</div>
+{% endblock programme %}
+
+{% block content %}
+    <form method='GET' id="filter">
+        <div class="row">
+            {% if perms.campaign.add_programme %}
+                <div class="col-sm-3 pull-right">
+                    <a class="btn" href="{% url 'programme:create' %}">Create Programme</a>
+                </div>
+            {% endif %}
+            {% if table.page %}
+                {% with table.page.paginator.count as total %}
+                {% with table.page.object_list|length as count %}
+                    <div class="col-sm-2">
+                        {% if table.page.has_previous %}
+                            <a href="{% querystring table.prefixed_page_field=table.page.previous_page_number %}">&laquo;</a>
+                        {% endif %}
+                        {% if table.page.has_previous or table.page.has_next %}
+                            {% blocktrans with table.page.number as current and table.paginator.num_pages as total %} Page <strong>{{ current }}</strong> of {{ total }}{% endblocktrans %}
+                        {% endif %}
+                        {% if table.page.has_next %}
+                            <a href="{% querystring table.prefixed_page_field=table.page.next_page_number %}">&raquo;</a>
+                        {% endif %}
+                        <br>
+                        {% if total != count %}{% blocktrans %}{{ count }} of {{ total }}{% endblocktrans %}{% else %}{{ total }}{% endif %} {% if total == 1 %}{{ table.data.verbose_name }}{% else %}{{ table.data.verbose_name_plural }}{% endif %}
+                    </div>
+                {% endwith %}
+                {% endwith %}
+            {% endif %}
+        </div>
+        <br>
+        <div class="row">
+        {# NB: This code is lifted from django_tables2/table.html to allow us to customise table rendering to include #}
+        {# django filter #}
+            <div class="col-xs-12">
+                <table{% if table.attrs %} {{ table.attrs.as_html }}{% endif %}>
+                {% if table.show_header %}
+                <thead>
+                    <tr>
+                    {% if table.columns.name %}
+                        <th {{ table.columns.name.attrs.th.as_html }}>
+                            <a href="{% querystring table.prefixed_order_by_field=table.columns.name.order_by_alias.next %}">
+                                {{ table.columns.name.header }}
+                            </a><br>
+                            <div class="btn-group">
+                                {{ filter.form.name }}
+                            </div>
+                                <button type="submit" class="btn-search">
+                                    <span class="glyphicon glyphicon-search"></span>
+                                    <span class="title">Search</span>
+                                </button>
+                        </th>
+                    {% endif %}
+                    {% if table.columns.company %}
+                        <th {{ table.columns.company.attrs.th.as_html }}>
+                            <a href="{% querystring table.prefixed_order_by_field=table.columns.company.order_by_alias.next %}">
+                                {{ table.columns.company.header }}
+                            </a><br>
+                            {{ filter.form.company }}
+                        </th>
+                    {% endif %}
+                    {% if table.columns.reseller %}
+                        <th {{ table.columns.reseller.attrs.th.as_html }}>
+                            <a href="{% querystring table.prefixed_order_by_field=table.columns.reseller.order_by_alias.next %}">
+                                {{ table.columns.reseller.header }}
+                            </a><br>
+                            {{ filter.form.company__reseller }}
+                        </th>
+                    {% endif %}
+                    {% if table.columns.category %}
+                        <th {{ table.columns.category.attrs.th.as_html }}>
+                            <a href="{% querystring table.prefixed_order_by_field=table.columns.category.order_by_alias.next %}">
+                                {{ table.columns.category.header }}
+                            </a><br>
+                            {{ filter.form.category }}
+                        </th>
+                    {% endif %}
+                    {% if table.columns.date_created %}
+                        <th {{ table.columns.date_created.attrs.th.as_html }}>
+                            <a href="{% querystring table.prefixed_order_by_field=table.columns.date_created.order_by_alias.next %}">
+                                {{ table.columns.date_created.header }}
+                            </a><br>
+                            {# Hidden input box to keep header aligned with all other headers which have filters beneath #}
+                            <input type="text" class="form-control" style="visibility: hidden">
+
+                        </th>
+                    {% endif %}
+                    {% if table.columns.completed_player_count %}
+                        {% with column=table.columns.completed_player_count %}
+                            <th {{ column.attrs.th.as_html }}>
+                                <a href="{% querystring table.prefixed_order_by_field=column.order_by_alias.next %}">
+                                    {{ column.header }}
+                                </a><br>
+                                {# Hidden input box to keep header aligned with all other headers which have filters beneath #}
+                                <input type="text" class="form-control" style="visibility: hidden">
+
+                            </th>
+                        {% endwith %}
+                    {% endif %}
+                    {% if table.columns.latest_completion %}
+                        {% with column=table.columns.latest_completion %}
+                            <th {{ column.attrs.th.as_html }}>
+                                <a href="{% querystring table.prefixed_order_by_field=column.order_by_alias.next %}">
+                                    {{ column.header }}
+                                </a><br>
+                                {# Hidden input box to keep header aligned with all other headers which have filters beneath #}
+                                <input type="text" class="form-control" style="visibility: hidden">
+
+                            </th>
+                        {% endwith %}
+                    {% endif %}
+                    {% if table.columns.status %}
+                        {% with column=table.columns.status %}
+                            <th {{ column.attrs.th.as_html }}>
+                                <a href="{% querystring table.prefixed_order_by_field=column.order_by_alias.next %}">
+                                    {{ column.header }}
+                                </a><br>
+                                    {{ filter.form.active }}
+                            </th>
+                        {% endwith %}
+                    {% endif %}
+                    </tr>
+                </thead>
+                {% endif %}
+                <tbody>
+                    {% for row in table.page.object_list|default:table.rows %} {# support pagination #}
+                    <tr {{ row.attrs.as_html }}>
+                        {% for column, cell in row.items %}
+                            {% autoescape off %}
+                                <td {{ column.attrs.td.as_html }}>{% if column.localize == None %}{{ cell }}{% else %}{% if column.localize %}{{ cell|localize }}{% else %}{{ cell|unlocalize }}{% endif %}{% endif %}</td>
+                            {% endautoescape %}
+                        {% endfor %}
+                    </tr>
+                    {% empty %}
+                    {% if table.empty_text %}
+                    <tr><td colspan="{{ table.columns|length }}">{{ table.empty_text }}</td></tr>
+                    {% endif %}
+                    {% endfor %}
+                </tbody>
+                {% if table.has_footer %}
+                <tfoot>
+                    <tr>
+                    {% for column in table.columns %}
+                        <td>{{ column.footer }}</td>
+                    {% endfor %}
+                    </tr>
+                </tfoot>
+                {% endif %}
+            </table>
+            </div>
+        </div>
+
+        <div class="row">
+            {# Create Programme #}
+            {% if perms.campaign.add_programme %}
+                <div class="col-sm-3 pull-right">
+                    <a class="btn" href="{% url 'programme:create' %}">Create Programme</a> <br>
+                </div>
+            {% endif %}
+
+            {# Pagination #}
+            {% if table.page %}
+                {% with table.page.paginator.count as total %}
+                {% with table.page.object_list|length as count %}
+                    <div class="col-sm-2">
+                        {% if table.page.has_previous %}
+                            <a href="{% querystring table.prefixed_page_field=table.page.previous_page_number %}">&laquo;</a>
+                        {% endif %}
+                        {% if table.page.has_previous or table.page.has_next %}
+                            {% blocktrans with table.page.number as current and table.paginator.num_pages as total %} Page <strong>{{ current }}</strong> of {{ total }}{% endblocktrans %}
+                        {% endif %}
+                        {% if table.page.has_next %}
+                            <a href="{% querystring table.prefixed_page_field=table.page.next_page_number %}">&raquo;</a>
+                        {% endif %}
+                        <br>
+                        {% if total != count %}{% blocktrans %}{{ count }} of {{ total }}{% endblocktrans %}{% else %}{{ total }}{% endif %} {% if total == 1 %}{{ table.data.verbose_name }}{% else %}{{ table.data.verbose_name_plural }}{% endif %}
+                    </div>
+                {% endwith %}
+                {% endwith %}
+            {% endif %}
+        </div>
+        {# Table Actions #}
+        <div class="row">
+            <div class="col-xs-12">
+                <div class="dropdown">
+                    <button class="btn btn-sm dropdown-toggle" type="button" id="tableDropDown" data-toggle="dropdown"
+                            aria-haspopup="true" aria-expanded="true">
+                        Download&ensp;<span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="tableDropDown">
+                        {% for name, description, help_text in table.get_action_choices %}
+                            <li><a title="{{ help_text }}" href="?programmes={{ table.programme_id_str }}&action={{ name }}">{{ description }}</a>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </form>
+{% endblock content %}
+
+{% block javascript %}
+    {{ block.super }}
+    <script type="text/javascript">
+        // Filter on drop-down change
+        $('select').on("change", function() {
+            $("#filter").submit();
+        });
+    </script>
+{% endblock javascript %}

@@ -1,0 +1,267 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags i18n %}
+
+{% block title %}{% trans "Online Terms of Service" %}{% endblock title %}
+
+{% block nav %}{% with section="users" %}{{ block.super }}{% endwith %}{% endblock nav %}
+
+
+{% block content %}
+<style>
+:target:before {
+  {# Offset against fixed header for anchors #}
+  content:"";
+  display:block;
+  height:50px; /* fixed header height*/
+  margin:-50px 0 0; /* negative fixed header height */
+}
+</style>
+    <div class="container">
+    <div class="row">
+        <div class="col-lg-12">
+
+            <div class="alert alert-info"><p>We are committed to ensure we are managing your data securely and
+                responsibly. Please read through our Terms and Conditions and Privacy Policy below, and if you are happy
+                please accept these at the bottom of the page.</p></div>
+
+            <h3 style="text-align: center">Online Terms of Service</h3>
+
+            <a href="#introduction">Introduction</a><br>
+            <a href="#access">Access</a><br>
+            <a href="#services">Our Services</a><br>
+            <a href="#changes">Changes to the Service and terms</a><br>
+            <a href="#suspension">Service suspension and termination</a><br>
+            <a href="#access2">Access to the Site/ Application</a><br>
+            <a href="#allowed">What you are allowed to do</a><br>
+            <a href="#notallowed">What you are not allowed to do</a><br>
+            <a href="#intellectual">Intellectual property rights</a><br>
+            <a href="#features">Site/ Application features and content</a><br>
+            <a href="#links">External links</a><br>
+            <a href="#liability">Our liability</a><br>
+            <a href="#general">General</a><br>
+            <a href="#contact">Contacting us</a><br>
+
+            <a id="introduction"></a>
+            <h4>Introduction</h4>
+
+            <p>These are the terms of supply for services provided on
+                <a href="https://www.arcticshores.com/">https://www.arcticshores.com/</a> (<strong>Site</strong>) and/or
+                through any web or mobile application we provide (<strong>Application</strong>). The Site/Application is
+                operated by or on behalf of Arctic Shores Limited (<strong>Arctic Shores</strong>, <strong>we</strong>,
+                <strong>us</strong> and <strong>our</strong>). We are a limited company, registered in England. Our
+                registered company number is 08589048, and our registered office is at Lowry House, 17 Marble Street,
+                Manchester, M2 3AW. Our VAT number is 165182604.</p>
+
+            <p>Your use of any of the services offered on the Site/Application (<strong>Services</strong>) is subject to
+                these terms and by using any Service you agree to be bound by them. You should print a copy of these
+                terms for future reference. We have been engaged by your employer, potential employer or recruitment
+                company ("<strong>Requesting Business</strong>") to provide you with access to our Services. As part of
+                this, both the Requesting Business and Arctic Shores may process your personal data. Please read our
+                Privacy and Cookies Policy
+                (<a href="https://www.arcticshores.com/privacy/">https://www.arcticshores.com/privacy/</a>) to learn how
+                your personal data is used. Your use of the Application is subject to our Mobile App EULA.</p>
+
+            <p>Arctic Shores provides game-based assessments (GBAs) to recruiters and companies who are wishing to
+                recruit new members of staff. We enable employers to differentiate their hiring process, raise brand
+                awareness, engage prospective talent and make fair and objective selection decisions. The GBA permits us
+                to develop a personality profile of the player (<strong>you</strong>, <strong>your</strong>) through
+                playing psychometrically designed game-based tasks made available through the Application.</p>
+
+            <p>These terms were last updated on 1st February 2018</p>
+
+            <a id="access"></a>
+            <h4>Access</h4>
+            <p>Your Requesting Business may ask you to access or download the GBA in order to complete the various
+                assessments, and shall provide you with a username and password to enable you to do so.</p>
+
+            <p>Where you download the GBA on to a device which does not belong to you, you must obtain their permission
+                to download the GBA prior to using the device.</p>
+
+            <a id="services"></a>
+            <h4>Our Services</h4>
+            <p>You acknowledge and agree that you are solely responsible for all use you make of any Service. You must
+                not allow anyone else to complete the GBA on your behalf. You must faithfully follow the GBA
+                instructions at all times and you acknowledge that any manipulation of your actions in the GBA will
+                render the results invalid. Further, you must not attempt to copy the GBA, in whole or in part
+                (including, for example, by taking screenshots of the GBA), or attempt to distribute the GBA, or any
+                part of it, unless expressly allowed by these terms.</p>
+
+            <a id="changes"></a>
+            <h4>Changes to the Service and terms</h4>
+            <p>As it is our policy continually to review and update our Service offerings, we reserve the right to make
+                changes to any Service and/or to these terms from time to time.</p>
+
+            <a id="suspension"></a>
+            <h4>Service suspension and termination</h4>
+            <p>We may, from time to time, with or without prior notice, temporarily suspend the operation of any Service
+                and/or the Site/Application (in whole or in part) for repair or maintenance work or in order to update
+                or upgrade any contents, features or functionality.</p>
+
+
+            <p>We may, with or without prior notice, terminate any contract we enter into with you
+                ("<strong>Contract</strong>") or suspend and/or terminate any Service and/or your use of your account in
+                the event that you have breached any of these terms.</p>
+
+            <p>If you have breached these terms, we may take such action as we deem appropriate. Such a breach by you
+                may result in our taking, with or without notice, all or any of the following actions:</p>
+            <ul>
+                <li>issue of a warning to you;
+                <li>immediate, temporary or permanent withdrawal of your right to use any Service;
+                <li>legal proceedings against you for reimbursement of all recoverable loss and damage resulting from
+                    the breach; and/or
+                <li>disclosure of all relevant information to law enforcement authorities as we reasonably feel is
+                    necessary.
+            </ul>
+
+            <p>The responses described above are not limited, and we may take any other action we deem appropriate.</p>
+
+            <p>Upon termination of any Contract or Service or your account, for any reason:</p>
+
+            <ul>
+                <li>all rights granted to you under these terms will immediately cease; and
+                <li>you must promptly discontinue all use of the relevant Service.
+            </ul>
+
+            <a id="access2"></a>
+            <h4>Access to the Site/ Application</h4>
+            <p>It is your responsibility to ensure your equipment (computer, laptop, netbook, tablet or other mobile
+                device) meets all the necessary technical specifications to enable you to access and use the Site/
+                Application and is compatible with the Site/ Application.</p>
+
+            <p>We cannot guarantee the continuous, uninterrupted or error-free operability of the Site/ Application.
+                There may be times when certain features, parts or content of the Site/ Application, or the entire Site/
+                Application, become unavailable (whether on a scheduled or unscheduled basis) or are modified, suspended
+                or withdrawn by us, in our sole discretion, without notice to you.  You agree that we will not be liable
+                to you or to any third party for any unavailability, modification, suspension or withdrawal of the Site,
+                or any features, parts or content of the Site/ Application.</p>
+
+            <a id="allowed"></a>
+            <h4>What you are allowed to do</h4>
+            <p>You may only use the Site/ Application for non-commercial use and only in accordance with these terms.
+                You may retrieve and display content from the Site on a computer screen, print and copy individual pages
+                and, subject to the next section, store such pages in electronic form. Additional terms may also apply
+                to certain features, parts or content of the Site/ Application and, where they apply, will be displayed
+                on-screen or accessible via a link.</p>
+
+            <a id="notallowed"></a>
+            <h4>What you are not allowed to do</h4>
+            <p>Except to the extent expressly set out in these terms, you are not allowed to:</p>
+            <ul>
+                <li>'scrape' content or store content of the Site on a server or other storage device connected to a
+                    network or create an electronic database by systematically downloading and storing all of the
+                    content of the Site;
+                <li>remove or change any content of the Site or attempt to circumvent security or interfere with the
+                proper working of the Site or the servers on which it is hosted; or
+                <li>create links to the Site from any other website, without our prior written consent.
+            </ul>
+
+            <p>You must only use the Site/ Application and anything available from the Site/ Application for lawful
+                purposes (complying with all applicable laws and regulations), in a responsible manner, and not in a way
+                that might damage our name or reputation or that of any of our affiliates.</p>
+
+            <p>All rights granted to you under these terms will terminate immediately in the event that you are in
+                breach of any of them.</p>
+
+            <a id="intellectual"></a>
+            <h4>Intellectual property rights</h4>
+            <p>All intellectual property rights in any content of the Site/ Application (including text, graphics,
+                software, photographs and other images, videos, sound, trademarks and logos) are owned by us or our
+                licensors. Except as expressly set out here, nothing in these terms gives you any rights in respect of
+                any intellectual property owned by us or our licensors and you acknowledge that you do not acquire any
+                ownership rights by downloading content from the Site/ Application. In the event you print off, copy or
+                store pages from the Site/ Application (only as permitted by these terms), you must ensure that any
+                copyright, trade mark or other intellectual property right notices contained in the original content are
+                reproduced.</p>
+
+            <a id="features"></a>
+            <h4>Site/ Application features and content</h4>
+            <p>We may change the format, features and content of the Site/ Application from time to time. You agree that
+                your use of the Site/ Application is on an 'as is' and 'as available' basis and at your sole risk.</p>
+
+            <p>Whilst we try to make sure that content on the Site/ Application consisting of information of which we
+                are the source is correct, you acknowledge that the Site/ Application may make content available which
+                is derived from a number of sources, for which we are not responsible. In all cases, information on the
+                Site/ Application is not intended to amount to authority or advice on which reliance should be placed.
+                You should check with us or the relevant information source before acting on any such information.</p>
+
+            <p>We make or give no representation or warranty as to the accuracy, completeness, currency, correctness,
+                reliability, integrity, quality, fitness for purpose or originality of any content of the Site/
+                Application and, to the fullest extent permitted by law, all implied warranties, conditions or other
+                terms of any kind are hereby excluded and we accept no liability for any loss or damage of any kind
+                incurred as a result of you or anyone else using the Site/ Application or relying on any of its content.
+            </p>
+
+            <p>We cannot and do not guarantee that any content of the Site/ Application will be free from viruses and/or
+                other code that may have contaminating or destructive elements. It is your responsibility to implement
+                appropriate IT security safeguards (including anti-virus and other security checks) to satisfy your
+                particular requirements as to the safety and reliability of content.</p>
+
+            <a id="links"></a>
+            <h4>External links</h4>
+            <p>The Site may, from time to time, include links to external sites, which may include links to third party
+                offers and promotions. We include these to provide you with access to information, products or services
+                that you may find useful or interesting. We are not responsible for the content of these sites or for
+                anything provided by them and do not guarantee that they will be continuously available. The fact that
+                we include links to such external sites does not imply any endorsement of or association with their
+                operators or promoters.</p>
+
+            <a id="liability"></a>
+            <h4>Our liability</h4>
+            <p>Nothing in these terms shall limit or exclude our liability to you:</p>
+            <ul>
+                <li>for death or personal injury caused by our negligence;
+                <li>for fraudulent misrepresentation;
+                <li>for breach of any term implied by the Consumer Rights Act 2015 and which, by law, may not be limited
+                    or excluded; or
+                <li>for any other liability that, by law, may not be limited or excluded.
+            </ul>
+
+            <p>We will not be liable or responsible for any failure to perform, or delay in performance of, any of the
+                Services, or our obligations under any Contract that is caused by events outside our reasonable control.
+            </p>
+
+            <a id="general"></a>
+            <h4>General</h4>
+            <p>You may not transfer or assign any or all of your rights or obligations under any Contract.</p>
+
+            <p>All notices given by you to us must be given in writing to the address set out at the end of these terms.
+                We may give notice to you by email.</p>
+
+            <p>If we fail to enforce any of our rights, that does not result in a waiver of that right.</p>
+
+            <p>If any provision of these terms is found to be unenforceable, all other provisions shall remain
+                unaffected.</p>
+
+            <p>These terms may not be varied except with our express written consent.</p>
+
+            <p>These terms and any document expressly referred to in them represent the entire agreement between you and
+                us in relation to the subject matter of any Contract. We are required by law to advise you that
+                Contracts may be concluded in the English language only and that no public filing requirements apply.
+            </p>
+
+            <p>These terms shall be governed by English law, except that if you live in Scotland or Northern Ireland
+                there may be certain mandatory applicable laws of your country which apply for your benefit and
+                protection in addition to or instead of certain provisions of English law.</p>
+
+            <p>You agree that any dispute between you and us regarding these terms or any Contract will only be dealt
+                with by the English courts, except if you live in Scotland or Northern Ireland, you can choose to bring
+                legal proceedings either in your country or in England, but if we bring legal proceedings, we may only
+                do so in your country.</p>
+
+            <p>The European Online Dispute Resolution platform
+                <a href="http://ec.europa.eu/consumers/odr/">http://ec.europa.eu/consumers/odr/</a> provides information
+                about alternative dispute resolution which may be of interest.</p>
+
+            <a id="contact"></a>
+            <h4>Contacting us</h4>
+            <p>Please submit any questions you have about these terms by email to support@arcticshores.com.</p>
+
+
+
+            {% csrf_token %}
+            {% crispy form %}
+
+        </div>
+    </div>
+    </div>
+{% endblock content %}

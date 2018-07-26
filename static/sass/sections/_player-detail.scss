@@ -1,0 +1,54 @@
+/**
+ * Programme Detail
+ */
+
+.player-detail-title {
+    .link {
+        font-size: 15px;
+    }
+}
+
+.player-detail-score {
+    margin: 1em;
+    border-radius: 15px;
+    padding-top: 1em;
+    padding-bottom: 1em;
+    text-align: center;
+    background-color: #f6f6f6;
+}
+
+.player-detail-score > [class*='col-']:before {
+    background: #e3e3e3;
+    bottom: 0;
+    content: " ";
+    left: 0;
+    position: absolute;
+    width: 1px;
+    top: 0;
+}
+
+.player-detail-score > [class*='col-']:first-child:before {
+    display: none;
+}
+
+.player-note-container {
+    .player-note-form-container {
+        display: none;
+    }
+    .player-note-content {
+        color: #777;
+    }
+}
+
+.player-note-panel {
+    margin-top: 20px;
+    .panel-title {
+        font-size: 15px;
+    }
+    .panel-body {
+        padding: 10px;
+    }
+    .player-note-panel__text {
+        margin: 0 0 0 0;
+    }
+}

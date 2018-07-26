@@ -1,0 +1,27 @@
+<table class="table {% if job_scores|length > 5 %} table-condensed {% endif %}">
+    <thead class="thead-inverse">
+        <tr>
+            <th>SOC Code</th>
+            <th>Description</th>
+            <th>Score</th>
+            <th>Band</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for score in SOC_scores %}
+        <tr>
+            <td>{{ score.soc_job.soc_code }}</td>
+            <td>{{ score.soc_job.soc_description }}</td>
+            <td>{{ score.score }}</td>
+            <td>
+                <span {% if score.band == 2 %} class="label label-success"
+                      {% elif score.band == 1 %} class="label label-warning"
+                      {% else %} class="label label-default"
+                      {% endif %}>
+                {{ score.get_band_display }}
+                </span>
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>

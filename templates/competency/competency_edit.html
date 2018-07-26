@@ -1,0 +1,261 @@
+{% extends "base.html" %}
+
+{% block title %}Competency Framework Edit{% endblock %}
+
+{% block nav %}{{ block.super }}{% endblock nav %}
+
+{% block breadcrumbs %}{% endblock %}
+
+{% block css %}
+    <style>
+        {% include "competency/includes/_edit.css" %}
+        .competency {
+            margin-bottom: 10px;
+            border: solid #EDF2F2 1px;
+            width: 100%;
+            padding: 10px;
+            padding-bottom: 0;
+            background-color: #F8F9F9;
+        }
+        #id_name {
+            width: 100%;
+        }
+
+        #id_description {
+            width: 100%;
+            height: 100px;
+        }
+    </style>
+    {{ block.super }}
+{% endblock %}
+
+{% block content %}
+    <h2>{{ competency_framework.name }}</h2>
+    <h3>{{ is_new_competency|yesno:"Add New,Edit" }} Competency</h3>
+    <p>
+        <span class="label label-info">Editable by Arctic Shores Staff Only</span>
+    </p>
+    <form id="edit-form" action="" method="POST">
+        {% if form.errors or formset.total_error_count %}
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="alert alert-danger">
+                        <p>Please correct errors below. Your changes have not yet been saved.</p>
+                    </div>
+                    {% if form.non_field_errors %}
+                        <ul>
+                            {% for error in form.non_field_errors %}
+                                <li style="color:#a94442;">{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
+        {% csrf_token %}
+        <div class="competency">
+            {% for field in form.visible_fields %}
+                <div class="row">
+                    <div class="col-xs-12 col-sm-9 col-md-6">
+                        <div>
+                            <strong>{{ field.label }}: </strong> <small>{{ field.help_text }}</small>
+                        </div>
+                        {% if field.errors %}
+                            <span style="color:#a94442;">
+                                {{ field.errors }}
+                            </span>
+                        {% endif %}
+                        <div>{{ field }}</div>
+                    </div>
+                </div>
+                <br>
+            {% endfor %}
+            {% for field in form.hidden_fields %}
+                {{ field }}
+            {% endfor %}
+        </div>
+
+        {# Competency Trait Contribution form container #}
+        <fieldset class="form-container">
+            <legend>
+                Personality Traits and Cognitive Abilities
+            </legend>
+            <p>
+                Adjust the contributions from personality traits and cognitive abilities to
+                the Competency Score.
+            </p>
+
+            {% if formset.non_form_errors %}
+                <div class="row">
+                    <div class="col-md-6">
+                        <span style="color:#a94442;">
+                            {{ formset.non_form_errors }}
+                        </span>
+                    </div>
+                </div>
+            {% endif %}
+            {{ formset.management_form }}
+
+            <div class="formset-container">
+                {% for form in formset %}
+                    <div class="trait">
+                        {% if form.errors %}
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <span style="color:#a94442;">
+                                        {% for field in form %}
+                                            {% if field.errors %}
+                                                {{ field.label_tag }} {{ field.errors }}
+                                            {% endif %}
+                                        {% endfor %}
+                                        {% for error in form.non_field_errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </span>
+                                </div>
+                            </div>
+                        {% endif %}
+                        {{ form.id }}
+                        <div class="row">
+                            <div class="col-md-6">
+                                <strong>Trait: </strong>{{ form.trait }}
+                                {{ form.DELETE.as_hidden }}
+                                <a class="remove" href="#">
+                                    <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Remove
+                                </a>
+                            </div>
+                        </div>
+                        <br>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <strong>Weighting: </strong>
+                                <span>{% if form.weighting.value %}{{ form.weighting.value }}{% else %}50{% endif %}</span>%
+                                <span class="weighting">{{ form.weighting }}</span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <strong>Ideal Range:</strong>
+                                <div id="ideal_range_threshold_1">{{ form.ideal_range_threshold_1.as_hidden }}</div>
+                                <div id="ideal_range_threshold_2">{{ form.ideal_range_threshold_2.as_hidden }}</div>
+                                <div class="slide"></div>
+                                {# These inputs must be after for <reasons> #}
+                                <div id="ideal_range_threshold_3">{{ form.ideal_range_threshold_3.as_hidden }}</div>
+                                <div id="ideal_range_threshold_4">{{ form.ideal_range_threshold_4.as_hidden }}</div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="steps">
+                                    <span class="tick" style="left: 10%">1</span>
+                                    <span class="tick" style="left: 20%">2</span>
+                                    <span class="tick" style="left: 30%">3</span>
+                                    <span class="tick" style="left: 40%">4</span>
+                                    <span class="tick" style="left: 50%">5</span>
+                                    <span class="tick" style="left: 60%">6</span>
+                                    <span class="tick" style="left: 70%">7</span>
+                                    <span class="tick" style="left: 80%">8</span>
+                                    <span class="tick" style="left: 90%">9</span>
+                                    <span class="tick" style="left: 100%">10</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            <input type="button" value="Add Trait" class="add-trait" data-template="#trait-template">
+        </fieldset>
+        <br>
+        <a id="confirm-competency-change" href="javascript: void(0)" class="btn" name="save">
+            Save and return to Framework
+        </a>
+        <button id="confirm-competency-add-another" type="submit" class="btn" name="_addanother">
+            Save and add another Competency
+        </button>
+        <a id="cancel-competency-change" href="javascript: void(0)" class="btn">Cancel</a>
+        {% if not is_new_competency %}
+            <a id='confirm-competency-delete' href="javascript: void(0)" class="btn btn-danger">
+                <span class="glyphicon glyphicon-trash"></span>
+                Delete
+            </a>
+        {% endif %}
+    </form>
+
+    {% if not is_new_competency and can_delete %}  {# Modal must be outside above form #}
+        {% include "competency/modals/confirm_competency_delete.html" with csrf_token=csrf_token competency_id=form.instance.id only %}
+    {% endif %}
+    {% include "competency/modals/confirm_competency_cancel.html" with competency_framework_id=competency_framework.id %}
+    {% include "competency/modals/confirm_competency_edit.html" %}
+
+{% endblock %}
+
+{% block javascript %}
+    {{ block.super }}
+    {# Empty template for adding new traits #}
+    <script type="text/html" id="trait-template">
+        <div class="trait">
+            <div class="row">
+                <div class="col-md-6">
+                    <strong>Trait:</strong>{{ formset.empty_form.trait }}
+                    {{ formset.empty_form.DELETE.as_hidden }}
+                    <a class="remove" href="#">
+                        <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Remove
+                    </a>
+                </div>
+            </div>
+            <br>
+            <div class="row">
+                <div class="col-md-6">
+                    <strong>Weighting: </strong><span>50</span>%
+                    <span class="weighting">{{ formset.empty_form.weighting }}</span>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <strong>Ideal Range:</strong>
+                    <div id="ideal_range_threshold_1">{{ formset.empty_form.ideal_range_threshold_1.as_hidden }}</div>
+                    <div id="ideal_range_threshold_2">{{ formset.empty_form.ideal_range_threshold_2.as_hidden }}</div>
+                    <div class="slide"></div>
+                    <div id="ideal_range_threshold_3">{{ formset.empty_form.ideal_range_threshold_3.as_hidden }}</div>
+                    <div id="ideal_range_threshold_4">{{ formset.empty_form.ideal_range_threshold_4.as_hidden }}</div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="steps">
+                        <span class="tick" style="left: 10%">1</span>
+                        <span class="tick" style="left: 20%">2</span>
+                        <span class="tick" style="left: 30%">3</span>
+                        <span class="tick" style="left: 40%">4</span>
+                        <span class="tick" style="left: 50%">5</span>
+                        <span class="tick" style="left: 60%">6</span>
+                        <span class="tick" style="left: 70%">7</span>
+                        <span class="tick" style="left: 80%">8</span>
+                        <span class="tick" style="left: 90%">9</span>
+                        <span class="tick" style="left: 100%">10</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </script>
+    {# End empty trait template #}
+    <script type="text/javascript">
+        {% include "competency/includes/_edit.js" %}
+
+        $("[id=cancel-competency-change]").click(function(event) {
+            event.preventDefault();
+            showModal('#confirmCancelChange');
+        });
+        $("[id=confirm-competency-change]").click(function(event) {
+            event.preventDefault();
+            showModal('#confirmEdit');
+        });
+        $("[id=confirm-competency-delete]").click(function(event) {
+            event.preventDefault();
+            showModal('#confirmDeleteModal');
+        });
+    </script>
+
+{% endblock %}
+

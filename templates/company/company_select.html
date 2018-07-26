@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block title %}Company{% endblock %}
+
+{% block nav %}{% with section="companies" %}{{ block.super }}{% endwith %}{% endblock nav %}
+
+{% block breadcrumbs %}
+    Manage Companies &raquo;
+    {% if request.user.is_staff or request.user.resellers.count > 1 %}
+        <a href="{% url 'company:resellers' %}">Resellers</a> &raquo;
+    {% endif %}
+    {{ reseller.name }} &raquo;
+    Companies
+{% endblock %}
+
+{% block content %}
+    {% with is_staff=user.is_staff is_reseller=user.is_reseller reseller_count=user.resellers.count %}
+        <div class="container">
+            <div class="row">
+                <h3 class="col-sm-2">Companies</h3>
+                <a class="btn col-sm-2 pull-right" href="{% url 'company:create' %}?reseller_id={{ reseller.id }}">
+                    Create Company
+                </a>
+            </div>
+            <br>
+            <div class="row">
+                {% if object_list %}
+                    <table class="table table-condensed">
+                        <tr>
+                            <th>Company Name</th>
+                            {% if is_staff or is_reseller and reseller_count > 1 %}<th>Reseller</th>{% endif %}
+                        </tr>
+
+                        {% for company_id, company_name, reseller_name in object_list %}
+                            <tr>
+                                <td>
+                                    {{ company_name }}
+                                    <a href="{% url 'company:update' company_id %}">
+                                        <span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit
+                                    </a>
+                                </td>
+                                {% if is_staff or is_reseller and reseller_count > 1 %}<td>{{ reseller_name }}</td>{% endif %}
+                            </tr>
+                        {% endfor %}
+                    </table>
+                {% else %}
+                    <p class="col-lg-6">
+                        No Companies available.
+                        <a href="{% url 'company:create' %}?reseller_id={{ reseller.id }}">Why not create one?</a>
+                    </p>
+                {% endif %}
+            </div>
+            <div class="row">
+                <a class="btn col-sm-2 pull-right" href="{% url 'company:create' %}?reseller_id={{ reseller.id }}">
+                    Create Company
+                </a>
+            </div>
+        </div>
+    {% endwith %}
+{% endblock %}

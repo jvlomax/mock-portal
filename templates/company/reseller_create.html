@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}Reseller{% endblock %}
+
+{% block nav %}{% with section="companies" %}{{ block.super }}{% endwith %}{% endblock nav %}
+
+{% block breadcrumbs %}
+    Manage Companies &raquo;
+    <a href="{% url 'company:resellers' %}">Resellers</a> &raquo;
+    {% if form.instance.pk %}{{ form.instance.name }}{% else %}Create Reseller{% endif %}
+{% endblock %}
+
+{% block content %}
+    {% if not form.instance.pk %}
+        <h3>Create Reseller</h3>
+    {% else %}
+        <h3>Update Reseller</h3>
+    {% endif %}
+    {% crispy form %}
+{% endblock content %}

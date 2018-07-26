@@ -1,0 +1,13 @@
+/**
+ * Panels
+ */
+
+.panel-primary {
+    border-color: $green;
+}
+
+.panel-primary>.panel-heading {
+    background-image: none;
+    background: $green;
+    border-color: $green;
+}
